@@ -334,10 +334,17 @@ def one_away(one: str, two: str) -> bool:
         will be considered as True, while there can be a case like this: "abcd" - "dcba".
     Answer. Let's see. Can we use hash-tables here?
 
-    Right answer. At first, we need to check len(one) - len(two) < 2. Otherwise, return False.
-    If len(one) == len(two), then both string must be equal in all places except one.
-    If len(one) == len(two) + 1 (len(one) can't be less than len(two) because of design of our algorithm)
-        then we set two pointer as the beginning of each string: id1 and id2.
+    Right answer. At first, we need to check len(one) - len(two) < 2. If it is greater than 2 return False,
+    If len(one) == len(two), then both string must be equal in all places except one, so we are going to
+        iterate through every string at the same time and count times when chars are unequal.
+        If there are less than two chars, return True, else return False.
+    If len(one) is less than len(two), then we call our function with swapped stirngs.
+    If len(one) == len(two) + 1, we set then we initialize two pointers as the beginning of each string: id1 and id2,
+        respectively. Then we iterate from 0 to len(two). If there are difference between id1-th element of string
+        one and id2-th element of string two, than we check if id1 != id2 ('cos if those indices are not equal,
+        then we encountered same case earlier, so it leads to at least two insertions). If id1 != id2 than we
+        return False. Else we increment id1 by one.
+
 
 
     :param two: str
@@ -374,31 +381,14 @@ def one_away(one: str, two: str) -> bool:
         return True
 
 
-if __name__ == "__main__":
-    # test_string_concat_vs_stringbuilder(n=50000, concat_string="abcdefg")
-    s = MyString("ba ab")
+def test_one_away() -> None:
     assert one_away("abcd", "abcde")
     assert one_away("aabcd", "abcd")
     assert one_away("abcd", "abccd")
+    assert one_away("pales", "pale")
+    assert not one_away("pale", "bake")
 
-    # assert one_away("pales", "pale")
-    # assert not one_away("pale", "bake")
-    # print(s.palindrome_permutation())
-    # assert "mr%20john%20smith" == s.urlify()
-    # test_arraylist_vs_array(1000000)
-    # s = MyString("abcdef")
-    # print(s.is_permutation("abcdef"))
-    # print(s.is_unique())
-    #
-    # al = ArrayList(t=int, scaling_factor=2)
-    # al.add(1.2)
-    # al.add(2.2)
-    # # al.add("3.")
-    # al.add(4.1)
-    # al.add(5)
-    #
-    # print(al)
-    # # al.modify_each(lambda x: x ** 2)
-    # print(al)
-    #
-    # al.add(8)
+
+if __name__ == "__main__":
+    
+    pass
