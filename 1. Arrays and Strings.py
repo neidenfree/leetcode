@@ -237,7 +237,6 @@ def test_string_concat_vs_stringbuilder(n=100000, concat_string="abcdef") -> Non
 
 # Interview Questions implementations using above data structures
 
-
 class MyString(str):
     def is_unique(self) -> bool:
         if not self:
@@ -382,6 +381,82 @@ class MyString(str):
         # endregion
 
 
+def is_substring(one: str, other: str) -> bool:
+    """
+    Given two strings, one and other, write an algorithm to check if one string is a substring for another.
+    For example, abc is a substring for abcdef, so is_substring('abc', 'abcdef') == true,
+    as well as is_substring('abcdef', 'abc').
+
+    Solution. At first, we must make sure that the "one" string is greater than the "other".
+    Then, we check if the lenght of one of strings is equal to zero. If it is, return True.
+    We set out pointer on the beginning of the second stirng. Then, we iterate through
+    first string and count how many chars from string one are equal to chars from other.
+    If we come to state when count of these equal chars is equal to length of second string,
+    we return True. Otherwise, we return false.
+
+    :param one: str
+    :param other: str
+    :return: bool
+    """
+    # to make sure first string is bigger
+    if len(one) < len(other):
+        return is_substring(other, one)
+    # If empty string is a substring of any string
+    if len(one) == 0 or len(other) == 0:
+        return True
+    cur_ind = 0
+    for c in one:
+        if c == other[cur_ind]:
+            cur_ind += 1
+            if cur_ind == len(other):
+                return True
+        else:
+            cur_ind = 0
+    return False
+
+
+def is_rotation(s1: str, s2: str) -> bool:
+    """
+    Assume you have a method is_substring which checks if one word is a substring of another.
+    Given two stirngs, s1 and s2, write code to check if s2 is a rotation of s1
+    using only one call to is_substring
+    e.g. "waterbottle" is a rotation of "erbottlewat".
+
+    I didn't came to solution myself, I used hints. All of them.
+    The solution is so brilliant and simple.
+    Of course, at first we check if the length of s1 is equal to s2.
+    If s1 is equal to s2, return true.
+    Then we append s2 to s2, using concatenation. I don't think SB will be really
+        useful there.
+
+    :param s1: str
+    :param s2: str
+    :return: bool
+    """
+    if len(s1) != len(s2):
+        return False
+    if s1 == s2:
+        return True
+    return is_substring(s1, s2 + s2)
+
+
+def test_is_substring() -> None:
+    assert is_substring("abcdef", "abc")
+    assert not is_substring("abcdef", "ced")
+    assert is_substring("abcdef", "def")
+    assert is_substring("abcdef", "abcdef")
+    assert is_substring("ab", "abc")
+    assert not is_substring("qwert", "bc")
+
+
+def test_is_rotation() -> None:
+    assert is_rotation("", "")
+    assert not is_rotation("", "a")
+    assert not is_rotation("a", "")
+    assert is_rotation("abc", "bca")
+    assert is_rotation("waterbottle", "rbottlewate")
+
+
 def one_away(one: str, two: str) -> bool:
     """
     There are three types of edits that can be perormed on strings: insert a character,
@@ -398,12 +473,19 @@ def one_away(one: str, two: str) -> bool:
         if their lengths differs not more than 1, otherwise function returns false.
         But! Hash tables don't consider the order of string: permutations of one string
         will be considered as True, while there can be a case like this: "abcd" - "dcba".
-    Answer. Let's see. Can we use hash-tables here? No, it must remain order!
+    Answer. Let's see. Can we use hash-tables here?
 
-    Right answer. At first, we need to check len(one) - len(two) < 2. Otherwise, return False.
-    If len(one) == len(two), then both string must be equal in all places except one.
-    If len(one) == len(two) + 1 (len(one) can't be less than len(two) because of design of our algorithm)
-        then we set two pointer as the beginning of each string: id1 and id2.
+    Right answer. At first, we need to check len(one) - len(two) < 2. If it is greater than 2 return False,
+    If len(one) == len(two), then both string must be equal in all places except one, so we are going to
+        iterate through every string at the same time and count times when chars are unequal.
+        If there are less than two chars, return True, else return False.
+    If len(one) is less than len(two), then we call our function with swapped stirngs.
+    If len(one) == len(two) + 1, we set then we initialize two pointers as the beginning of each string: id1 and id2,
+        respectively. Then we iterate from 0 to len(two). If there are difference between id1-th element of string
+        one and id2-th element of string two, than we check if id1 != id2 ('cos if those indices are not equal,
+        then we encountered same case earlier, so it leads to at least two insertions). If id1 != id2 than we
+        return False. Else we increment id1 by one.
+
 
 
     :param two: str
@@ -509,14 +591,40 @@ class Matrix:
 
         return Matrix(mat=res)
 
+    def zero_matrix(self) -> Matrix:
+        """
+        Write an algorithm such that if an element in an MxN matrix if 0,
+        its entire row and column are set to 0.
+        :return: Matrix
+        """
+        set_columns = set()
+        set_rows = set()
+
+        mat = self._mat
+        for i in range(self._shape[0]):
+            for j in range(self._shape[1]):
+                if mat[i][j] == 0:
+                    set_columns.add(i)
+                    set_rows.add(j)
+        for col in set_columns:
+            for j in range(self._shape[1]):
+                mat[col][j] = 0
+        for row in set_rows:
+            for i in range(self._shape[0]):
+                mat[i][row] = 0
+        return Matrix(mat=mat)
+
 
 if __name__ == "__main__":
-    # m = Matrix(mat=[[12], [12], [12]])
-    m = Matrix(shape=(3, 1), mat=[[1, 1], [2, 2]])
-    
-    print(m)
-
-    # m = Matrix(shape=(4, 4))
+    test_is_rotation()
+    # test_is_substring()
+    # mat = [
+    #     [0, 2, 1],
+    #     [1, 1, 2],
+    #     [1, 2, 2],
+    #     [0, 1, 2]
+    # ]
+    # m = Matrix(mat=mat)
     # print(m)
-    # z = m.rotate()
-    # print(z)
+    # m2 = m.zero_matrix()
+    # print(m2)
