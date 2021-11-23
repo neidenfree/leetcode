@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+import random
 from time import time
 import numpy as np
 
@@ -234,6 +237,7 @@ def test_string_concat_vs_stringbuilder(n=100000, concat_string="abcdef") -> Non
 
 # Interview Questions implementations using above data structures
 
+
 class MyString(str):
     def is_unique(self) -> bool:
         if not self:
@@ -454,7 +458,65 @@ def test_compress() -> None:
     assert "qwertyuiop" == MyString("qwertyuiop").compress()
 
 
-if __name__ == "__main__":
-    test_compress()
-    # test_string_concat_vs_stringbuilder(n=2021, concat_string="abcdef")
+class Matrix:
+    def __init__(self, *args, **kwargs):
+        if len(kwargs) == 0:
+            self._mat = [[]]
+            self._shape = (0, 0)
 
+        if "shape" in kwargs:
+            if type(kwargs['shape']) == tuple and len(kwargs['shape']) == 2:
+                self._shape = kwargs['shape']
+                self._mat = []
+                for _ in range(kwargs['shape'][0]):
+                    a = []
+                    for _ in range(kwargs['shape'][1]):
+                        a.append(random.randint(0, 10))
+                    self._mat.append(a)
+            else:
+                raise TypeError("For shape you must provide a tuple with exactly two positive variables!")
+
+        if "mat" in kwargs:
+            # TODO: Check if this kwarg is a two-dimensional array!
+            try:
+                if kwargs["mat"][0][0] is not None:
+                    mat = kwargs["mat"]
+                    self._mat = mat
+                    self._shape = (len(mat), len(mat[0]))
+            except TypeError:
+                raise TypeError("You must provide a two-dimensional array!")
+
+    def __str__(self):
+        res = ""
+        for i in range(self._shape[0]):
+            for j in range(self._shape[1]):
+                res += "%3d " % self._mat[i][j]
+            res += "\n"
+        return res
+
+    def rotate(self) -> Matrix:
+        if self._shape[0] != self._shape[1]:
+            raise IndexError("You can't rotate non-square matrices!")
+        if self._shape == (1, 1):
+            return self
+        mat = self._mat
+        res = []
+        for i in range(self._shape[0]):
+            temp = []
+            for j in range(self._shape[1]):
+                temp.append(mat[self._shape[0] - 1 - j][i])
+            res.append(temp)
+
+        return Matrix(mat=res)
+
+
+if __name__ == "__main__":
+    # m = Matrix(mat=[[12], [12], [12]])
+    m = Matrix(shape=(3, 1), mat=[[1, 1], [2, 2]])
+    
+    print(m)
+
+    # m = Matrix(shape=(4, 4))
+    # print(m)
+    # z = m.rotate()
+    # print(z)
