@@ -224,7 +224,6 @@ def test_string_concat_vs_stringbuilder(n=100000, concat_string="abcdef") -> Non
 
     start = time()
     sb = StringBuilder()
-    custom_string = ""
     for _ in range(n):
         sb.add(concat_string)
     custom_string = str(sb)
@@ -315,6 +314,69 @@ class MyString(str):
 
         return True
 
+    def compress(self) -> str:
+        """
+        Implement a method to perform basic string compression using the counts of repeated characters.
+        For example, the string aabcccccaaa would become a2b1c5a3. If the "compressed" string would not become
+        smaller than the original string, your method should return the original string.
+
+        Straightforward solution. At first, let's see if the length of the given string is less than 3. If it's true,
+        return the original string. For example, if given string is aa, method must return a2, which is no shorter
+        than original string.
+
+        Optimal solution. We can use stringbuilder for this task. Also, we can check the length of output string
+        while iterating over original string to stop algorithm when it'll be over than length of original string.
+
+        :return: str
+        """
+        # region Straightforward solution with checking the length of result string.
+        # if len(self) < 3:
+        #     return str(self)
+        # current_char = self[0]
+        # count = 1
+        # result = ""
+        # for i in range(1, len(self)):
+        #     if self[i] == current_char:
+        #         count += 1
+        #     else:
+        #         result += current_char + str(count)
+        #         if len(result) >= len(self):
+        #             return str(self)
+        #         current_char = self[i]
+        #         count = 1
+        # result += current_char + str(count)
+        # if len(result) >= len(self):
+        #     return str(self)
+        # return result
+        # endregion
+
+        # region Solution with StringBuilder
+        if len(self) < 3:
+            return str(self)
+        result_len = 0
+        sb = StringBuilder()
+        current_char = self[0]
+        count = 1
+        for i in range(1, len(self)):
+            if self[i] == current_char:
+                count += 1
+            else:
+                s = current_char + str(count)
+                result_len += len(s)
+                if result_len > len(self):
+                    return str(self)
+                sb.add(s)
+                current_char = self[i]
+                count = 1
+        s = current_char + str(count)
+        result_len += len(s)
+        if result_len > len(self):
+            return str(self)
+        sb.add(s)
+        return str(sb)
+
+        # endregion
+
 
 def one_away(one: str, two: str) -> bool:
     """
@@ -332,19 +394,12 @@ def one_away(one: str, two: str) -> bool:
         if their lengths differs not more than 1, otherwise function returns false.
         But! Hash tables don't consider the order of string: permutations of one string
         will be considered as True, while there can be a case like this: "abcd" - "dcba".
-    Answer. Let's see. Can we use hash-tables here?
+    Answer. Let's see. Can we use hash-tables here? No, it must remain order!
 
-    Right answer. At first, we need to check len(one) - len(two) < 2. If it is greater than 2 return False,
-    If len(one) == len(two), then both string must be equal in all places except one, so we are going to
-        iterate through every string at the same time and count times when chars are unequal.
-        If there are less than two chars, return True, else return False.
-    If len(one) is less than len(two), then we call our function with swapped stirngs.
-    If len(one) == len(two) + 1, we set then we initialize two pointers as the beginning of each string: id1 and id2,
-        respectively. Then we iterate from 0 to len(two). If there are difference between id1-th element of string
-        one and id2-th element of string two, than we check if id1 != id2 ('cos if those indices are not equal,
-        then we encountered same case earlier, so it leads to at least two insertions). If id1 != id2 than we
-        return False. Else we increment id1 by one.
-
+    Right answer. At first, we need to check len(one) - len(two) < 2. Otherwise, return False.
+    If len(one) == len(two), then both string must be equal in all places except one.
+    If len(one) == len(two) + 1 (len(one) can't be less than len(two) because of design of our algorithm)
+        then we set two pointer as the beginning of each string: id1 and id2.
 
 
     :param two: str
@@ -389,6 +444,17 @@ def test_one_away() -> None:
     assert not one_away("pale", "bake")
 
 
+def test_compress() -> None:
+    assert "string" == MyString("string").compress()
+    assert "a4" == MyString("aaaa").compress()
+    assert "bb" == MyString("bb").compress()
+    assert "a5b2" == MyString("aaaaabb").compress()
+    assert "a3" == MyString("aaa").compress()
+    assert "a5b1" == MyString("aaaaab").compress()
+    assert "qwertyuiop" == MyString("qwertyuiop").compress()
+
+
 if __name__ == "__main__":
-    
-    pass
+    test_compress()
+    # test_string_concat_vs_stringbuilder(n=2021, concat_string="abcdef")
+
