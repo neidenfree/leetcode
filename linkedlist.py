@@ -11,7 +11,7 @@ class ListNode:
 
 
 class LinkedList:
-    def __init__(self, head=None):
+    def __init__(self, head: ListNode = None):
         self.head = head
 
     def add(self, elem):
@@ -22,6 +22,27 @@ class LinkedList:
             temp = ListNode(elem, None)
             temp.next = self.head
             self.head = temp
+
+    def print_reverse(self):
+        def reverse_rec(head: ListNode) -> None:
+            if head is None:
+                return
+            reverse_rec(head.next)
+            print(head)
+
+        def reverse_iter(head: ListNode) -> None:
+            a = []
+            while head is not None:
+                a.append(head.val)
+                head = head.next
+            print(a[::-1])
+
+        head_temp = self.head
+        reverse_rec(head_temp)
+        return None
+
+    def delete_node(self, node: ListNode):
+        pass
 
     def __str__(self):
         s = "["
@@ -154,14 +175,10 @@ class Solution:
 
 
 if __name__ == "__main__":
-    head = ListNode(5)
-    head = add_to_list(head, 4)
-    head = add_to_list(head, 3)
-    head = add_to_list(head, 2)
-    head = add_to_list(head, 1)
-    head = add_to_list(head, 5)
-
-    a = Solution()
-    # print_list(Solution.middleNode(head=head))
-    n = 2
-    print_list(a.removeNthFromEnd(head=head, n=n))
+    l = LinkedList()
+    l.add(2)
+    l.add(3)
+    l.add(4)
+    l.add(5)
+    l.print_reverse()
+    print(l)
