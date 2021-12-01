@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Optional
 
 
@@ -41,8 +42,38 @@ class LinkedList:
         reverse_rec(head_temp)
         return None
 
-    def delete_node(self, node: ListNode):
-        pass
+    def copy(self) -> Optional[LinkedList]:
+        def rec_copy(head: ListNode, new_head: LinkedList) -> None:
+            if head is None:
+                return None
+            rec_copy(head.next, new_head)
+            new_head.add(head.val)
+
+        h = self.head
+        nh = LinkedList()
+        rec_copy(h, nh)
+        return nh
+
+    # def copy(self) -> Optional[LinkedList]:
+    #     if self.head is None:
+    #         return None
+    #     head = self.head
+    #     new_head = LinkedList()
+    #     while head is not None:
+    #         new_head.add(head.val)
+    #         head = head.next
+    #     return new_head
+
+    def delete_node(self, val) -> None:
+        head = self.head
+        if head is None:
+            return None
+        if head.val == val:
+            self.head = head.next
+        while head.next is not None:
+            if head.next.val == val:
+                head.next = head.next.next
+            head = head.next
 
     def __str__(self):
         s = "["
@@ -176,9 +207,13 @@ class Solution:
 
 if __name__ == "__main__":
     l = LinkedList()
+    l.add(1)
     l.add(2)
     l.add(3)
     l.add(4)
+    l.add(4)
     l.add(5)
-    l.print_reverse()
+    # l.delete_node(1)
+    l.delete_node(4)
     print(l)
+

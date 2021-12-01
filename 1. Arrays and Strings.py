@@ -3,7 +3,7 @@ from strings import *
 
 
 if __name__ == "__main__":
-
+    pass
     # l = s.split(' ')
     # l = [x for x in l if x != '']
     # print(sum([len(x) for x in l]) / len(l))
