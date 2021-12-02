@@ -3,7 +3,7 @@ from typing import Optional, Union
 
 
 class ListNode:
-    def __init__(self, val=0, next=None):
+    def __init__(self, val=None, next: ListNode = None):
         self.val = val
         self.next = next
 
@@ -14,20 +14,32 @@ class ListNode:
 class LinkedList:
     """
     All tasks from CTCI:
-    1. Demove duplicates 2. Return Kth to last element
-    3. Delete middle node  4. Partition (?)
+    1+. Demove duplicates 2+. Return Kth to last element
+    3+. Delete middle node  4. Partition (?)
     5. Sum two lists (big numbers sum) 6. Palindrome
     7. Intersection (?) 8. Lood detection (?)
     """
 
+    # Overrides
+
     def __init__(self, head: Union[ListNode, list] = None):
+        self.head: ListNode = None
         if type(head) == ListNode:
             self.head = head
         if type(head) == list:
-            self.head = None
             for el in reversed(head):
                 self.add(el)
 
+    def __str__(self):
+        s = ""
+        head = self.head
+        while head is not None:
+            s += str(head.val) + ' -> '
+            head = head.next
+        s += 'null'
+        return s
+
+    # Vital methods
     def add(self, elem):
         if type(elem) == ListNode:
             elem.next = self.head
@@ -37,6 +49,19 @@ class LinkedList:
             temp.next = self.head
             self.head = temp
 
+    def copy(self) -> Optional[LinkedList]:
+        def rec_copy(head: ListNode, new_head: LinkedList) -> None:
+            if head is None:
+                return None
+            rec_copy(head.next, new_head)
+            new_head.add(head.val)
+
+        h = self.head
+        nh = LinkedList()
+        rec_copy(h, nh)
+        return nh
+
+    # Tasks
     def print_reverse(self):
         def reverse_rec(head: ListNode) -> None:
             if head is None:
@@ -54,18 +79,6 @@ class LinkedList:
         head_temp = self.head
         reverse_rec(head_temp)
         return None
-
-    def copy(self) -> Optional[LinkedList]:
-        def rec_copy(head: ListNode, new_head: LinkedList) -> None:
-            if head is None:
-                return None
-            rec_copy(head.next, new_head)
-            new_head.add(head.val)
-
-        h = self.head
-        nh = LinkedList()
-        rec_copy(h, nh)
-        return nh
 
     def remove_duplicates(self) -> None:
         """
@@ -159,15 +172,69 @@ class LinkedList:
                 head.next = head.next.next
             head = head.next
 
-    def __str__(self):
-        s = "["
+    def middle_node(self) -> Optional[ListNode]:
+        if self.head is None:
+            return None
+        if self.head.next is None:
+            return self.head
         head = self.head
-        while head is not None:
-            s += str(head.val) + ', '
+        temp = self.head
+        while temp is not None:
+            temp = temp.next
+            if temp is not None:
+                temp = temp.next
+            else:
+                return head
+            if temp is None:
+                return head
             head = head.next
-        s = s[:len(s) - 2]
-        s += ']'
-        return s
+        return head
+
+    def delete_middle_node(self) -> None:
+        if self.head is None:
+            return None
+        if self.head.next is None:
+            self.head = None
+        head = self.head
+        temp = self.head
+        temp_head = head
+        while temp.next is not None:
+            temp = temp.next
+            if temp.next is not None:
+                temp = temp.next
+            else:
+                break
+            if temp.next is None:
+                break
+            head = head.next
+        print("ЗАЛУУПА")
+        head.next = head.next.next
+        self.head = temp_head
+        # return head
+
+    def partition(self, k: int) -> None:
+        if self.head is None:
+            return
+        if self.head.next is None:
+            return
+        head_less = ListNode()
+        head_greater = ListNode()
+        head_temp = head_less
+        head = self.head
+        # temp = list_less
+        while head is not None:
+            if head.val < k:
+                temp = ListNode(head.val, None)
+                temp.next = head_less
+                head_less = temp
+            else:
+                temp = ListNode(head.val, None)
+                temp.next = head_greater
+                head_greater = temp
+            head = head.next
+
+        head_temp.next = head_greater
+        self.head = head_less
 
 
 def add_to_list(head: ListNode, elem):
@@ -290,7 +357,7 @@ class Solution:
 
 
 if __name__ == "__main__":
-    l = LinkedList([1, 2, 3, 4, 5])
+    l = LinkedList([3, 5, 8, 5, 10, 2, 1])
     # l.add(2)
     # l.add(4)
     # l.add(3)
@@ -299,7 +366,15 @@ if __name__ == "__main__":
     # l.add(6)
     # l.add(2)
     print(l)
-    l.print_reverse()
+    l.partition(5)
+    print(l)
+
+    # print(l.middle_node())
+    # l.delete_middle_node()
+    # print(l)
+
+    # print(l.middle_node())
+    # l.print_reverse()
     # print(l.get_kth_from_to_last(1))
     # l.remove_duplicates()
     # print(l)
