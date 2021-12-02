@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Optional
+from typing import Optional, Union
 
 
 class ListNode:
@@ -12,8 +12,21 @@ class ListNode:
 
 
 class LinkedList:
-    def __init__(self, head: ListNode = None):
-        self.head = head
+    """
+    All tasks from CTCI:
+    1. Demove duplicates 2. Return Kth to last element
+    3. Delete middle node  4. Partition (?)
+    5. Sum two lists (big numbers sum) 6. Palindrome
+    7. Intersection (?) 8. Lood detection (?)
+    """
+
+    def __init__(self, head: Union[ListNode, list] = None):
+        if type(head) == ListNode:
+            self.head = head
+        if type(head) == list:
+            self.head = None
+            for el in reversed(head):
+                self.add(el)
 
     def add(self, elem):
         if type(elem) == ListNode:
@@ -53,6 +66,77 @@ class LinkedList:
         nh = LinkedList()
         rec_copy(h, nh)
         return nh
+
+    def remove_duplicates(self) -> None:
+        """
+        Modified version, seems to be working well.
+        :return:
+        """
+        if self.head is None:
+            return None
+        head = self.head
+        temp_head = self.head
+        values = {head.val: 1}
+        while head is not None and head.next is not None:
+            if head.next.val in values:
+                temp = head.next
+                while temp is not None and temp.val in values:
+                    temp = temp.next
+                head.next = temp
+            else:
+                values[head.next.val] = 1
+            head = head.next
+        self.head = temp_head
+
+    def remove_duplicates_addition(self) -> None:
+        """
+        Simplified version with other linked list
+        :return:
+        """
+        if self.head is None:
+            return None
+        head = self.head
+        values = {}
+        while head is not None:
+            values[head.val] = 1
+            head = head.next
+        new_list = LinkedList()
+        for val in reversed(list(values.keys())):
+            new_list.add(val)
+        self.head = l.head
+
+    def get_kth_from_to_last(self, k: int) -> Optional[ListNode]:
+        if self.head is None:
+            return None
+        head = self.head
+        head2 = self.head
+        for i in range(k):
+            if head2 is not None:
+                head2 = head2.next
+            else:
+                return None
+        while head2 is not None:
+            head2 = head2.next
+            head = head.next
+        return head
+
+    def bubble_sort(self) -> None:
+        """
+        This method has function id in it. As I understand, it is some kind
+        of analogue of & operator in C.
+        Quote: "CPython implementation detail: This is the address of the object in memory."
+                https://docs.python.org/3/library/functions.html#id
+        :return:
+        """
+        head = self.head
+        while head is not None:
+            head2 = head
+            while head2 is not None:
+                if head2.val < head.val:
+                    head.val, head2.val = head2.val, head.val
+                print(id(head), id(head2))
+                head2 = head2.next
+            head = head.next
 
     # def copy(self) -> Optional[LinkedList]:
     #     if self.head is None:
@@ -206,14 +290,16 @@ class Solution:
 
 
 if __name__ == "__main__":
-    l = LinkedList()
-    l.add(1)
-    l.add(2)
-    l.add(3)
-    l.add(4)
-    l.add(4)
-    l.add(5)
-    # l.delete_node(1)
-    l.delete_node(4)
+    l = LinkedList([1, 2, 3, 4, 5])
+    # l.add(2)
+    # l.add(4)
+    # l.add(3)
+    # l.add(1)
+    # l.add(6)
+    # l.add(6)
+    # l.add(2)
     print(l)
-
+    l.print_reverse()
+    # print(l.get_kth_from_to_last(1))
+    # l.remove_duplicates()
+    # print(l)
