@@ -217,24 +217,21 @@ class LinkedList:
             return
         if self.head.next is None:
             return
-        head_less = ListNode()
-        head_greater = ListNode()
-        head_temp = head_less
+        head_less = LinkedList()
+        head_greater = LinkedList()
         head = self.head
-        # temp = list_less
         while head is not None:
             if head.val < k:
-                temp = ListNode(head.val, None)
-                temp.next = head_less
-                head_less = temp
+                head_less.add(head.val)
             else:
-                temp = ListNode(head.val, None)
-                temp.next = head_greater
-                head_greater = temp
+                head_greater.add(head.val)
             head = head.next
+        head = head_less.head
+        while head.next is not None:
+            head = head.next
+        head.next = head_greater.head
+        self.head = head_less.head
 
-        head_temp.next = head_greater
-        self.head = head_less
 
 
 def add_to_list(head: ListNode, elem):
@@ -357,7 +354,7 @@ class Solution:
 
 
 if __name__ == "__main__":
-    l = LinkedList([3, 5, 8, 5, 10, 2, 1])
+    l = LinkedList([8, 5, 20, 5, 10, 2, 8])
     # l.add(2)
     # l.add(4)
     # l.add(3)
@@ -366,7 +363,7 @@ if __name__ == "__main__":
     # l.add(6)
     # l.add(2)
     print(l)
-    l.partition(5)
+    l.partition(8)
     print(l)
 
     # print(l.middle_node())
