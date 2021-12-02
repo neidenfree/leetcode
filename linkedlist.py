@@ -116,7 +116,8 @@ class LinkedList:
         new_list = LinkedList()
         for val in reversed(list(values.keys())):
             new_list.add(val)
-        self.head = l.head
+        # ВОЗМОЖНО НЕВЕРНО, Я ТУТ НЕЧАЯННО НАТЫКАЛ ЧЕГО_ТО
+        self.head = new_list.head
 
     def get_kth_from_to_last(self, k: int) -> Optional[ListNode]:
         if self.head is None:
@@ -151,15 +152,6 @@ class LinkedList:
                 head2 = head2.next
             head = head.next
 
-    # def copy(self) -> Optional[LinkedList]:
-    #     if self.head is None:
-    #         return None
-    #     head = self.head
-    #     new_head = LinkedList()
-    #     while head is not None:
-    #         new_head.add(head.val)
-    #         head = head.next
-    #     return new_head
 
     def delete_node(self, val) -> None:
         head = self.head
@@ -278,6 +270,17 @@ class LinkedList:
         self.head = head_less.head
 
     def sum_lists(self, other: LinkedList) -> int:
+        """
+        Well working method. There are tests that cover all possible cases:
+                assert LinkedList([9, 9]).sum_lists(LinkedList([9, 9])) == 198
+                assert LinkedList([9, 9, 9]).sum_lists(LinkedList([9, 9])) == 1098
+                assert LinkedList([9]).sum_lists(LinkedList([9, 9])) == 108
+                assert LinkedList([2, 1]).sum_lists(LinkedList([3, 8])) == 95
+                assert LinkedList([9, 1]).sum_lists(LinkedList([3, 8])) == 102
+                assert LinkedList([9, 1]).sum_lists(LinkedList([3, 8])) == 102
+                assert LinkedList([3, 8]).sum_lists(LinkedList()) == 83
+                assert LinkedList([1, 1, 1, 1, 1, 1, 1]).sum_lists(LinkedList([3])) == 1111114
+        """
         if self.head is None and other.head is None:
             return 0
 
@@ -298,16 +301,8 @@ class LinkedList:
             head = head.next
             head2 = head2.next
 
-        if head2 is not None:
-            while head2 is not None:
-                temp = head2.val + remainder
-                remainder = 0
-                if temp > 9:
-                    remainder = 1
-                    temp = temp % 10
-                result += rank * temp
-                rank *= 10
-                head2 = head2.next
+        if head is None:
+            head = head2
 
         if head is not None:
             while head is not None:
@@ -322,6 +317,58 @@ class LinkedList:
         if remainder == 1:
             result += rank
         return result
+
+    def is_palindrome(self) -> bool:
+        if self.head is None:
+            return True
+        if self.head.next is None:
+            return True
+        l2 = LinkedList()
+        head = self.head
+        while head is not None:
+            l2.add(head.val)
+            head = head.next
+        head = self.head
+        head2 = l2.head
+        while head is not None:
+            if head.val != head2.val:
+                return False
+            head = head.next
+            head2 = head2.next
+        return True
+
+
+class CircularList:
+    """
+    Thought it'd be useful for Loop Detection, but it's not, actually.
+    """
+    def __init__(self, val=None):
+        if val is None:
+            self.head = None
+        else:
+            self.head = ListNode(val=val, next=self.head)
+
+    def add(self, val) -> None:
+        if self.head is None:
+            self.head = ListNode(val=val, next=self.head)
+            self.head.next = self.head
+            return
+
+        temp = ListNode(val, self.head.next)
+        self.head.next = temp
+        self.head = temp
+
+        # self.head = temp
+
+    def infinite_loop(self, k: int = 100) -> None:
+        if self.head is None:
+            return None
+        head = self.head
+        iters = 0
+        while head is not None and iters < k:
+            print(head.val)
+            iters += 1
+            head = head.next
 
 
 def add_to_list(head: ListNode, elem):
@@ -443,38 +490,99 @@ class Solution:
             p2 = p2.next
 
 
+def is_intersect(a: ListNode, b: ListNode) -> bool:
+    if a is None or b is None:
+        return False
+    run1 = a
+    run2 = b
+    while run1.next is not None:
+        run1 = run1.next
+    while run2.next is not None:
+        run2 = run2.next
+    return run1 == run2
+
+
+def get_intersect_node(a: ListNode, b: ListNode) -> Optional[ListNode]:
+    import ctypes
+
+    if not is_intersect(a, b):
+        return None
+    addr_a = LinkedList()
+    addr_b = LinkedList()
+    run_a = a
+    run_b = b
+    while run_a is not None:
+        addr_a.add(id(run_a))
+        run_a = run_a.next
+    while run_b is not None:
+        addr_b.add(id(run_b))
+        run_b = run_b.next
+    temp = None
+    run_a = addr_a.head
+    run_b = addr_b.head
+    print(addr_a)
+    print(addr_b)
+    while run_a is not None and run_b is not None and run_a.val == run_b.val:
+        temp = run_a.val
+        run_a = run_a.next
+        run_b = run_b.next
+    if temp is None:
+        raise Exception("WHAT??")
+    print(temp)
+    return ctypes.cast(temp, ctypes.py_object).value
+    # return ctypes.cast(temp, ctypes.py_object)
+
+    # return False
+
+
+def test_intersect_node() -> None:
+    a = ListNode(8)
+    a.next = ListNode(5)
+    a.next.next = ListNode(2)
+    a.next.next.next = ListNode(3)
+    a.next.next.next.next = ListNode(9)
+
+    b = ListNode(21)
+    b.next = a.next.next.next
+
+    print(get_intersect_node(a, b))
+
+
+def get_loop_start_node(a: ListNode) -> Optional[ListNode]:
+    if a is None:
+        return None
+    addr = {}
+    head = a
+    while head is not None:
+        if id(head) in addr:
+            return head
+        addr[id(head)] = 1
+        head = head.next
+
+def test_get_loop_start_node() -> None:
+    a = ListNode(7, None)
+    a.next = ListNode(8)
+    a.next.next = ListNode(1)
+    a.next.next.next = ListNode(2)
+    a.next.next.next.next = ListNode(3)
+    a.next.next.next.next.next = a.next.next.next
+    print(get_loop_start_node(a))
+
+
+
+
+
+
 if __name__ == "__main__":
-    l = LinkedList([9, 9])
-    l2 = LinkedList([9, 9])
-    # print(l.sum_lists(l2))
 
-    assert LinkedList([9, 9]).sum_lists(LinkedList([9, 9])) == 198
-    assert LinkedList([9, 9, 9]).sum_lists(LinkedList([9, 9])) == 1098
-    assert LinkedList([9]).sum_lists(LinkedList([9, 9])) == 108
-    assert LinkedList([2, 1]).sum_lists(LinkedList([3, 8])) == 95
-    assert LinkedList([9, 1]).sum_lists(LinkedList([3, 8])) == 102
-    assert LinkedList().sum_lists(LinkedList([3, 8])) == 83
-    assert LinkedList([3, 8]).sum_lists(LinkedList()) == 83
+    pass
+    # test_intersect_node()
 
-    # assert LinkedList([9, 9]).sum_lists(LinkedList([9, 9])) == 198
-    # assert LinkedList([9, 9]).sum_lists(LinkedList([9, 9])) == 198
-    # assert LinkedList([9, 9]).sum_lists(LinkedList([9, 9])) == 198
-    # assert LinkedList([9, 9]).sum_lists(LinkedList([9, 9])) == 198
-    # assert LinkedList([9, 9]).sum_lists(LinkedList([9, 9])) == 198
 
-    # l2 =
-    # l1 =
-    # p = 10
-    # print(l, 'partition =', p)
-    # l.partition(p)
-    # print(l)
+    # assert is_intersect(a, b)
+    # run = b
+    # while run is not None:
+    #     print(run.val)
+    #     run = run.next
 
-    # print(l.middle_node())
-    # l.delete_middle_node()
-    # print(l)
-
-    # print(l.middle_node())
-    # l.print_reverse()
-    # print(l.get_kth_from_to_last(1))
-    # l.remove_duplicates()
-    # print(l)
+    # assert is_intersect(a, b)
