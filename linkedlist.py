@@ -213,6 +213,51 @@ class LinkedList:
         # return head
 
     def partition(self, k: int) -> None:
+        """
+        Write code to partition a linked list around a value X, such that all nodes less
+            than X come before all nodes greater than or equal to X. If X is contained within
+            the list, the values of X only need to be after the elements less than X.
+        The partition element X can appear anywhere in the "right partition";
+            it does not need to appear between the left and right partitions.
+
+        This is slightly faster solution than partition_old: we have only one iteration
+            over all elements from original linked list.
+        """
+        if self.head is None:
+            return
+        if self.head.next is None:
+            return
+        head_less = None
+        head_greater = None
+        temp_head = None
+        head = self.head
+        while head is not None:
+            if head.val < k:
+                if head_less is None:
+                    head_less = ListNode(head.val)
+                    temp_head = head_less
+                else:
+                    temp = ListNode(head.val)
+                    temp.next = head_less
+                    head_less = temp
+            else:
+                if head_greater is None:
+                    head_greater = ListNode(head.val)
+                else:
+                    temp = ListNode(head.val)
+                    temp.next = head_greater
+                    head_greater = temp
+            head = head.next
+        if temp_head is not None:
+            temp_head.next = head_greater
+            self.head = head_less
+
+    def partition_old(self, k: int) -> None:
+        """
+        Straightforward solution.
+        :param k:
+        :return:
+        """
         if self.head is None:
             return
         if self.head.next is None:
@@ -232,6 +277,51 @@ class LinkedList:
         head.next = head_greater.head
         self.head = head_less.head
 
+    def sum_lists(self, other: LinkedList) -> int:
+        if self.head is None and other.head is None:
+            return 0
+
+        result = 0
+        rank = 1
+        remainder = 0
+        head = self.head
+        head2 = other.head
+
+        while head is not None and head2 is not None:
+            temp = head.val + head2.val + remainder
+            remainder = 0
+            if temp > 9:
+                remainder = 1
+                temp = temp % 10
+            result += temp * rank
+            rank *= 10
+            head = head.next
+            head2 = head2.next
+
+        if head2 is not None:
+            while head2 is not None:
+                temp = head2.val + remainder
+                remainder = 0
+                if temp > 9:
+                    remainder = 1
+                    temp = temp % 10
+                result += rank * temp
+                rank *= 10
+                head2 = head2.next
+
+        if head is not None:
+            while head is not None:
+                temp = head.val + remainder
+                remainder = 0
+                if temp > 9:
+                    remainder = 1
+                    temp = temp % 10
+                result += rank * temp
+                rank *= 10
+                head = head.next
+        if remainder == 1:
+            result += rank
+        return result
 
 
 def add_to_list(head: ListNode, elem):
@@ -354,17 +444,30 @@ class Solution:
 
 
 if __name__ == "__main__":
-    l = LinkedList([8, 5, 20, 5, 10, 2, 8])
-    # l.add(2)
-    # l.add(4)
-    # l.add(3)
-    # l.add(1)
-    # l.add(6)
-    # l.add(6)
-    # l.add(2)
-    print(l)
-    l.partition(8)
-    print(l)
+    l = LinkedList([9, 9])
+    l2 = LinkedList([9, 9])
+    # print(l.sum_lists(l2))
+
+    assert LinkedList([9, 9]).sum_lists(LinkedList([9, 9])) == 198
+    assert LinkedList([9, 9, 9]).sum_lists(LinkedList([9, 9])) == 1098
+    assert LinkedList([9]).sum_lists(LinkedList([9, 9])) == 108
+    assert LinkedList([2, 1]).sum_lists(LinkedList([3, 8])) == 95
+    assert LinkedList([9, 1]).sum_lists(LinkedList([3, 8])) == 102
+    assert LinkedList().sum_lists(LinkedList([3, 8])) == 83
+    assert LinkedList([3, 8]).sum_lists(LinkedList()) == 83
+
+    # assert LinkedList([9, 9]).sum_lists(LinkedList([9, 9])) == 198
+    # assert LinkedList([9, 9]).sum_lists(LinkedList([9, 9])) == 198
+    # assert LinkedList([9, 9]).sum_lists(LinkedList([9, 9])) == 198
+    # assert LinkedList([9, 9]).sum_lists(LinkedList([9, 9])) == 198
+    # assert LinkedList([9, 9]).sum_lists(LinkedList([9, 9])) == 198
+
+    # l2 =
+    # l1 =
+    # p = 10
+    # print(l, 'partition =', p)
+    # l.partition(p)
+    # print(l)
 
     # print(l.middle_node())
     # l.delete_middle_node()
