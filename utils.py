@@ -66,3 +66,6 @@ def binary_search_index(nums: List[object], target) -> int:
             left = m + 1
 
     return -1
+
+
+a = 500
