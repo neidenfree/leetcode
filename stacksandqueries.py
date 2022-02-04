@@ -3,8 +3,8 @@ from collections import deque
 
 
 class StackNode:
-    def __init__(self, a: int):
-        self.value = a
+    def __init__(self, a: object):
+        self.value: object = a
         self.next = None
 
 
@@ -22,7 +22,7 @@ class Stack:
             return self.head.value
         return None
 
-    def push(self, a: int):
+    def push(self, a: object):
         temp = self.head
         new = StackNode(a)
         new.next = self.head
@@ -31,7 +31,7 @@ class Stack:
         self.head: StackNode = new
         self.count += 1
 
-    def min(self) -> int:
+    def min(self) -> object:
         return self.__min
 
     def find_min(self) -> Optional[int]:
@@ -88,6 +88,142 @@ class Stack:
             result.push(temp.value)
             temp = temp.next
         return result
+
+    def is_palindrome(self) -> bool:
+        if self.head is None:
+            return True
+        new_s = Stack()
+        temp = self.head
+        while temp is not None:
+            new_s.push(temp.value)
+            temp = temp.next
+        temp = self.head
+        temp2 = new_s.head
+        while temp is not None:
+            if temp.value != temp2.value:
+                return False
+            temp = temp.next
+            temp2 = temp2.next
+        return True
+
+
+class Queue:
+    def __init__(self):
+        self.head: Optional[StackNode] = None
+        self.count: int = 0
+
+    def push(self, a: object) -> None:
+        if self.head is None:
+            self.head = StackNode(a)
+            return None
+        temp = self.head
+        while temp.next is not None:
+            temp = temp.next
+        temp.next = StackNode(a)
+        self.count += 1
+
+    def pop(self) -> Optional[object]:
+        if self.head is None:
+            return None
+        temp = self.head.value
+        self.head = self.head.next
+        self.count -= 1
+        return temp
+
+    def __str__(self):
+        temp: StackNode = self.head
+        s: str = ''
+        while temp is not None:
+            s += f"{temp.value} => "
+            temp = temp.next
+        s += 'null'
+        return s
+
+
+class NumberQueue(Queue):
+    def mean(self) -> float:
+        temp = self.head
+        res = 0
+        while temp is not None:
+            res += temp.value
+            temp = temp.next
+        return res / self.count
+
+    def __init__(self):
+        super(NumberQueue, self).__init__()
+        self.max = None
+        self.min = None
+
+    def push(self, a: float) -> None:
+        if not self.max:
+            self.max = a
+            self.min = a
+        if a > self.max:
+            self.max = a
+        if a < self.min:
+            self.min = a
+        super(NumberQueue, self).push(a)
+
+    # def max(self):
+    #
+    # def min(self):
+
+
+class MyQueue(Stack):
+    # def push(self, a: object) -> None:
+    #     s = Stack()
+    #     temp = self.head
+    #     while temp is not None:
+    #         s.push(temp.value)
+    #         temp = temp.next
+    #     s.push(a)
+    #     self.head = s.head
+
+    def __str__(self):
+        temp = self.head
+        s = Stack()
+        while temp is not None:
+            s.push(temp.value)
+            temp = temp.next
+
+        return str(s)
+
+
+def test_stack_queue():
+    a = MyQueue()
+    a.push(1)
+    a.push(2)
+    # a.push(3)
+    # a.push(4)
+    a.push(5)
+    a.pop()
+    print(a)
+
+
+def test_palindrome():
+    a = Stack()
+    a.push(1);
+    a.push(2);
+    a.push(2);
+    a.push(2)
+    assert not a.is_palindrome()
+    a.push(1)
+    assert a.is_palindrome()
+
+
+def test_queue():
+    q = NumberQueue()
+    q.push(1)
+    q.push(2)
+    q.push(3)
+    q.push(4)
+    q.push(5)
+    # q.pop()
+    # q.pop()
+    # q.pop()
+
+    print(q)
+    print(q.mean())
 
 
 def sort_stack(s: Stack):
@@ -164,12 +300,16 @@ class Solution:
         return len(st) == 0
 
 
-def main():
+def test_valid_parentheses():
     a = Solution()
     assert not a.valid_parentheses('}{{}}')
     assert a.valid_parentheses('{{[]}}')
     assert not a.valid_parentheses('{{[(]}}')
     assert a.valid_parentheses('{{}}')
+
+
+def main():
+    test_stack_queue()
 
 
 if __name__ == "__main__":
