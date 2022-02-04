@@ -17,6 +17,11 @@ class Stack:
     def __bool__(self) -> bool:
         return self.head is not None
 
+    def peek(self):
+        if self.head is not None:
+            return self.head.value
+        return None
+
     def push(self, a: int):
         temp = self.head
         new = StackNode(a)
@@ -84,6 +89,7 @@ class Stack:
             temp = temp.next
         return result
 
+
 def sort_stack(s: Stack):
     if s.head is None:
         return None
@@ -94,6 +100,7 @@ def sort_stack(s: Stack):
         new_s.remove_by_value(m)
         result.push(m)
     return result
+
 
 class SetOfStacks:
     """
@@ -126,8 +133,6 @@ class SetOfStacks:
         return temp
 
 
-
-
 def set_of_stacks_test():
     a = SetOfStacks(max_elem=6)
     print(bool(a))
@@ -139,17 +144,32 @@ def set_of_stacks_test():
     print(a.pop())
 
 
-def main():
-    a = Stack()
-    a.push(23)
-    a.push(22)
-    a.push(51)
-    a.push(11)
-    a.push(21)
-    b = sort_stack(a)
+class Solution:
+    def valid_parentheses(self, s: str) -> bool:
+        if s is None or len(s) == 0:
+            return False
+        par = {'{': '}', '[': ']', '(': ')'}
+        opening = '{[('
+        closing = '}])'
+        st = Stack()
 
-    print(a)
-    print(b)
+        for c in s:
+            # First, handle the case when string starts with opening bracket
+            if st.head is None and c in closing:
+                return False
+            if st.peek() and st.peek() in opening and c == par[st.peek()]:
+                st.pop()
+            else:
+                st.push(c)
+        return len(st) == 0
+
+
+def main():
+    a = Solution()
+    assert not a.valid_parentheses('}{{}}')
+    assert a.valid_parentheses('{{[]}}')
+    assert not a.valid_parentheses('{{[(]}}')
+    assert a.valid_parentheses('{{}}')
 
 
 if __name__ == "__main__":
