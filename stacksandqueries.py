@@ -170,14 +170,6 @@ class NumberQueue(Queue):
 
 
 class MyQueue(Stack):
-    # def push(self, a: object) -> None:
-    #     s = Stack()
-    #     temp = self.head
-    #     while temp is not None:
-    #         s.push(temp.value)
-    #         temp = temp.next
-    #     s.push(a)
-    #     self.head = s.head
 
     def __str__(self):
         temp = self.head
