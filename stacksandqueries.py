@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from collections import deque
 
 
@@ -177,7 +177,6 @@ class MyQueue(Stack):
         while temp is not None:
             s.push(temp.value)
             temp = temp.next
-
         return str(s)
 
 
@@ -194,9 +193,9 @@ def test_stack_queue():
 
 def test_palindrome():
     a = Stack()
-    a.push(1);
-    a.push(2);
-    a.push(2);
+    a.push(1)
+    a.push(2)
+    a.push(2)
     a.push(2)
     assert not a.is_palindrome()
     a.push(1)
@@ -210,12 +209,8 @@ def test_queue():
     q.push(3)
     q.push(4)
     q.push(5)
-    # q.pop()
-    # q.pop()
-    # q.pop()
 
-    print(q)
-    print(q.mean())
+    # print(q.mean())
 
 
 def sort_stack(s: Stack):
@@ -239,7 +234,7 @@ class SetOfStacks:
 
     def __init__(self, max_elem: int):
         self.max_elem = max_elem
-        self.set: list[Stack] = [Stack()]
+        self.set: List[Stack] = [Stack()]
         self.current_set = 0
 
     def __bool__(self):
@@ -298,10 +293,13 @@ def test_valid_parentheses():
     assert a.valid_parentheses('{{[]}}')
     assert not a.valid_parentheses('{{[(]}}')
     assert a.valid_parentheses('{{}}')
+    assert not a.valid_parentheses('{{(}}')
 
 
 def main():
-    test_stack_queue()
+    test_queue()
+    # test_valid_parentheses()
+    # test_stack_queue()
 
 
 if __name__ == "__main__":
