@@ -37,7 +37,6 @@ def _comparison(root1: Optional[TreeNode], root2: Optional[TreeNode]):
     return True
 
 
-
 class Solution:
     def preorderTraversal(self, root: Optional[TreeNode]) -> List[str]:
         res = []
@@ -230,6 +229,38 @@ class Solution:
         # _mirror(root.right)
         return res
 
+    def hasPathSum(self, root: Optional[TreeNode], targetSum: int) -> bool:
+        def _path_sum(root: Optional[TreeNode], target: int, current: int) -> bool:
+            if root is None:
+                return False
+            if root.left is None and root.right is None:
+                print(current + root.val)
+                return target == current + root.val
+            if _path_sum(root.left, target, current + root.val):
+                return True
+            if _path_sum(root.right, target, current + root.val):
+                return True
+            return False
+
+        return _path_sum(root, targetSum, 0)
+
+def test_has_sum():
+    g = TreeNode(7, None, None)
+    h = TreeNode(2, None, None)
+    e = TreeNode(5, None, None)
+    f = TreeNode(4, None, None)
+    c = TreeNode(8, e, f)
+    d = TreeNode(11, g, h)
+    b = TreeNode(4, d, None)
+    a = TreeNode(5, b, c)
+
+    sol = Solution()
+    sol.print_tree(a)
+    # 27    22    18    17
+    print(sol.hasPathSum(a, 1))
+    print(sol.hasPathSum(None, 1))
+    print(sol.hasPathSum(d, 20))
+
 
 
 def test_symmetry():
@@ -265,11 +296,6 @@ def test_symmetry():
     print(sol.isSymmetric(a))
 
     # assert not sol.isSymmetric(a)
-
-
-
-
-
 
 
 def tree_height(root: Optional[TreeNode]) -> int:
@@ -313,6 +339,7 @@ def test_depth() -> None:
     s.print_tree(f)
     print('depth = ', s.maxDepth(f))
 
+
 def test_comparsion() -> None:
     a2 = TreeNode(2, None, None)
     a1 = TreeNode(1, a2, None)
@@ -343,8 +370,9 @@ def test_traversals():
 
 
 if __name__ == '__main__':
+    test_has_sum()
     # test_comparsion()
-    test_symmetry()
+    # test_symmetry()
 
     # print(tree_height(f))
 
