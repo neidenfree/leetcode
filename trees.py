@@ -13,6 +13,12 @@ class TreeNode:
         return str(self.val)
 
 
+class Node(TreeNode):
+    def __init__(self, val, left=None, right=None, next=None):
+        super().__init__(val, left, right)
+        self.next = next
+
+
 def _mirror(root: Optional[TreeNode]) -> None:
     if root is None:
         return None
@@ -90,49 +96,6 @@ class Solution:
                 q.append(elem.right)
         return res
 
-    def levelOrder(self, root: Optional[TreeNode]) -> List[List[str]]:
-        if root is None:
-            return [[]]
-        res = []
-        q = deque()
-        res.append([root.val])
-        child_count = 0
-        if root.left is not None:
-            q.append(root.left)
-            child_count += 1
-        if root.right is not None:
-            q.append(root.right)
-            child_count += 1
-        child_count_2 = 0
-        r = []
-
-        for _ in range(child_count):
-            elem = q.popleft()
-            r.append(elem.val)
-            if elem.left is not None:
-                child_count_2 += 1
-                q.append(elem.left)
-            if elem.right is not None:
-                child_count_2 += 1
-                q.append(elem.right)
-        res.append(r)
-        child_count = 0
-        r = []
-        if len(q) == 0:
-            return res
-        for _ in range(child_count_2):
-            elem = q.popleft()
-            r.append(elem.val)
-            if elem.left is not None:
-                child_count += 1
-                q.append(elem.left)
-            if elem.right is not None:
-                child_count += 1
-                q.append(elem.right)
-        res.append(r)
-
-        return res
-
     def levelOrderList(self, root: Optional[TreeNode]) -> List[List[str]]:
         if root is None:
             return []
@@ -145,6 +108,10 @@ class Solution:
                 if elem.right:
                     r.append(elem.right)
             res.append(r)
+        return res
+
+    def levelOrderListValues(self, root: Optional[TreeNode]) -> List[List[str]]:
+        res = self.levelOrderList(root)
         result = []
         for level in res:
             r = []
@@ -244,6 +211,163 @@ class Solution:
 
         return _path_sum(root, targetSum, 0)
 
+    def buildTree(self, inorder: List[int], postorder: List[int]) -> Optional[TreeNode]:
+        if len(inorder) != len(postorder):
+            return None
+        if len(inorder) == 0:
+            return None
+        # Let's assume, that in other ways our input is correct. Maybe it'll be
+        # different elements in two arrays, maybe some elements will happen to be
+        # in different amounts and so on. I can write code to check this,
+        # but it will make the function too complex.
+        # I found a solution, but it seems to be so hard for me
+        # https://www.geeksforgeeks.org/construct-a-binary-tree-from-postorder-and-inorder/
+
+    def _connect(self, root: Optional[Node]) -> Optional[Node]:
+        if root is None:
+            return None
+        if root.left is not None and root.right is not None:
+            root.left.next = root.right
+        if root.left is not None and root.left.right is not None:
+            root.left.right.next = root.right.left
+        self._connect(root.left)
+        self._connect(root.right)
+
+    def connect(self, root: Optional[Node]) -> Optional[Node]:
+        self._connect(root)
+        return root
+
+    def connect_all(self, root: Optional[Node]) -> Optional[Node]:
+        """
+        Actually, task said that you must provide a solution with constant extra space,
+            which I don't get how to achieve this.
+        But, the task said that you must provide this solution for PERFECT binary tree,
+            which seems to be possible with constant extra space.
+        Solution below works for all kinds of binary trees, not only perfect.
+        But does it in O(N) space, where N is the count of nodes.
+        """
+        # self._connect(root)
+        r = self.levelOrderList(root)
+        for level in r:
+            for i in range(len(level) - 1):
+                level[i].next = level[i + 1]
+        return root
+
+    def lowestCommonAncestor_slow(self, root: TreeNode, p: TreeNode, q: TreeNode) -> TreeNode:
+        """
+        At first, I need to write a function, which checks if there are element in the tree.
+        Then I'll apply this function to left and right subtrees of root, trying to find
+            p and q. If p and q are in the same branch, recur into that branch. Otherwise, return
+                root of the branch.
+            This straightforward approach worked quite well, but it turned out, that
+                it is too slow for big trees. Let's try to optimize it!!!
+        This is too slow solution, so I came with a better one
+        """
+
+        def is_value(root: Optional[TreeNode], value: int) -> bool:
+            if root is None:
+                return False
+            if root.val == value:
+                return True
+            if root.left and is_value(root.left, value):
+                return True
+            if root.right and is_value(root.right, value):
+                return True
+            return False
+
+        def lca(root: TreeNode, p: TreeNode, q: TreeNode) -> TreeNode:
+            if root.val == p.val:
+                return root
+            if root.val == q.val:
+                return root
+
+            p_left = is_value(root.left, p.val)
+            q_left = is_value(root.left, q.val)
+
+            if not p_left and q_left:
+                return root
+            if p_left and not q_left:
+                return root
+            if not p_left and not q_left:
+                return lca(root.right, p, q)
+            if p_left and q_left:
+                return lca(root.left, p, q)
+
+        return lca(root, p, q)
+
+    def lowestCommonAncestor(self, root: TreeNode, p: TreeNode, q: TreeNode) -> TreeNode:
+        """
+        Okay, here are better solution. So, you need to find path from the root to p and to q.
+        Then, you compare this two paths and return the first different node.
+        """
+
+        def get_path(root: TreeNode, node: TreeNode, path: List[TreeNode]) -> List[TreeNode]:
+            if root is None:
+                return None
+            if root.val == node.val:
+                path += [root]
+                return path
+            return get_path(root.left, node, path + [root]) or get_path(root.right, node, path + [root])
+
+        path_p = get_path(root, p, [])
+        path_q = get_path(root, q, [])
+        print('path_p = ', path_p)
+        print('path_q = ', path_q)
+        min_len = min(len(path_q), len(path_p))
+        res = path_p[0]
+        for i in range(0, min_len):
+            if path_p[i] == path_q[i]:
+                if path_p[i] == q or path_p[i] == p:
+                    return path_p[i]
+                res = path_p[i]
+            else:
+                return res
+
+
+
+def lsa_test():
+    sol = Solution()
+
+
+    # f = TreeNode(0)
+    # g = TreeNode(8)
+    # h = TreeNode(7)
+    # i = TreeNode(4)
+    # d = TreeNode(6)
+    # c = TreeNode(1, f, g)
+    # e = TreeNode(2, h, i)
+    # b = TreeNode(5, d, e)
+    # a = TreeNode(3, b, c)
+    #
+    # # print(sol.preorderTraversal(a))
+    # p = f
+    # q = g
+    # print(f'lca for {p} and {q} = ', sol.lowestCommonAncestor(c, p, q))
+    # sol.print_tree(c)
+
+    b = TreeNode(2)
+    a = TreeNode(1, b, None)
+
+    p = a
+    q = b
+    print(f'lca for {p} and {q} = ', sol.lowestCommonAncestor(a, p, q))
+    sol.print_tree(a)
+
+
+
+def test_connect():
+    sol = Solution()
+    d = Node(4)
+    e = Node(5)
+    f = Node(6)
+    g = Node(7)
+    b = Node(2, d, e)
+    c = Node(3, f, g)
+    a = Node(1, b, c, None)
+    sol.connect(a)
+    sol.print_tree(a)
+
+
 def test_has_sum():
     g = TreeNode(7, None, None)
     h = TreeNode(2, None, None)
@@ -260,7 +384,6 @@ def test_has_sum():
     print(sol.hasPathSum(a, 1))
     print(sol.hasPathSum(None, 1))
     print(sol.hasPathSum(d, 20))
-
 
 
 def test_symmetry():
@@ -370,7 +493,7 @@ def test_traversals():
 
 
 if __name__ == '__main__':
-    test_has_sum()
+    lsa_test()
     # test_comparsion()
     # test_symmetry()
 
