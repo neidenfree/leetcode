@@ -195,13 +195,22 @@ class Solution:
                 res += 1
         return res
 
-
-
+    def findDisappearedNumbers(self, nums: List[int]) -> List[int]:
+        max_n = len(nums)
+        present = {}
+        for elem in nums:
+            if elem not in present:
+                present[elem] = 1
+        res = []
+        for i in range(1, max_n + 1):
+            if i not in present:
+                res.append(i)
+        return res
 
 
 if __name__ == '__main__':
     sol = Solution()
 
-    nums = [3, 2, 2, 4, 6, 5]
+    nums = [4, 3, 2, 7, 8, 2, 3, 1]
     print(nums)
-    print(sol.sortArrayByParity(nums))
+    print(sol.findDisappearedNumbers(nums))
