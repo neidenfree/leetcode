@@ -1,6 +1,9 @@
 from typing import List
 from collections import deque
 
+# There are link where I get all tasks from
+# https://leetcode.com/explore/learn/card/fun-with-arrays/
+
 
 class Solution:
     def findMaxConsecutiveOnes(self, nums: List[int]) -> int:
