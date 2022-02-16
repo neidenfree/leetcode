@@ -1,3 +1,6 @@
+from typing import Optional
+
+
 class Node:
     def __init__(self, val: int, next=None, prev=None):
         self.val: int = val
@@ -121,17 +124,165 @@ class MyLinkedList:
         return r
 
 
+class ListNode:
+    def __init__(self, x):
+        self.val = x
+        self.next = None
+
+    def __str__(self):
+        return str(self.val)
+
+
+class Solution:
+    def hasCycle(self, head: Optional[ListNode]) -> bool:
+        if head is None:
+            return False
+        fast = head
+        slow = head
+        while fast is not None:
+            if fast.next is None:
+                break
+            fast = fast.next.next
+            if fast == slow:
+                return True
+            slow = slow.next
+
+        return False
+
+    def detectCycle(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        if head is None:
+            return None
+        vals = {}
+        temp = head
+        while temp is not None:
+            if temp in vals:
+                return temp
+            else:
+                vals[temp] = 1
+                temp = temp.next
+        return None
+
+    def getIntersectionNode(self, headA: ListNode, headB: ListNode) -> Optional[ListNode]:
+        vals = {}
+        temp = headA
+        while temp is not None:
+            vals[temp] = 1
+            temp = temp.next
+        temp = headB
+        while temp is not None:
+            if temp in vals:
+                return temp
+            temp = temp.next
+        return None
+
+    def removeNthFromEnd(self, head: Optional[ListNode], n: int) -> Optional[ListNode]:
+        if head is None:
+            return None
+        temp = head
+        for i in range(n):
+            if not temp:
+                return head
+            temp = temp.next
+        fast = temp
+        slow = head
+        if temp is None:
+            head = head.next
+            return head
+        while fast.next is not None:
+            fast = fast.next
+            slow = slow.next
+        if slow.next:
+            slow.next = slow.next.next
+        else:
+            slow.next = None
+        return head
+
+    def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        temp = head
+        dummy = None
+        while temp is not None:
+            one = temp.next
+            temp.next = dummy
+            dummy = temp
+            temp = one
+        return dummy
+
+    def removeElements(self, head: Optional[ListNode], val: int) -> Optional[ListNode]:
+        if head is None:
+            return None
+        temp = head
+        while temp and temp.val == val:
+            temp = temp.next
+        head = temp
+        if temp is None:
+            return None
+        while temp.next is not None:
+            if temp.next and temp.next.val == val:
+                temp.next = temp.next.next
+            else:
+                temp = temp.next
+        return head
+
+    def oddEvenList(self, head: Optional[ListNode]) -> Optional[ListNode]:
+
+
+
+
+
+def test_remove():
+    h1 = ListNode(3)
+    h2 = ListNode(1)
+    h3 = ListNode(1)
+    h4 = ListNode(1)
+    h5 = ListNode(3)
+    h1.next = h2
+    h2.next = h3
+    h3.next = h4
+    h4.next = h5
+    sol = Solution()
+    res = sol.removeElements(h1, 3)
+    print('thats is')
+
+
+def test_reverse():
+    h1 = ListNode(1)
+    h2 = ListNode(2)
+    # h3 = ListNode(3)
+    # h4 = ListNode(4)
+    # h5 = ListNode(5)
+    h1.next = h2
+    # h2.next = h3
+    # h3.next = h4
+    # h4.next = h5
+    sol = Solution()
+    res = sol.reverseList(h1)
+    print('thats it')
+
+
+def test_cycle():
+    h1 = ListNode(1)
+    h2 = ListNode(2)
+    h3 = ListNode(3)
+    h4 = ListNode(4)
+    h5 = ListNode(5)
+    h1.next = h2
+    h2.next = h3
+    h3.next = h4
+    h4.next = h5
+    sol = Solution()
+    res = sol.reverseList(h1)
+
+    print('is done')
+
+    # assert not sol.hasCycle(h3)
+
+
 if __name__ == "__main__":
-    obj = MyLinkedList()
-    obj.addAtHead(1)
-    obj.addAtTail(2)
-    obj.addAtTail(3)
-    # obj.deleteAtIndex(1)
-    obj.addAtIndex(3, 10)
+    test_remove()
 
-    # print(obj.get(3))
-    # obj.deleteAtIndex(4)
-    # print(obj.get(1))
-    print(obj)
-
-    a = 200
+    # a = {}
+    # a[1] = 2
+    # a[2] = 3
+    # a[3] = 4
+    # for el in a:
+    #     print(a[el])
