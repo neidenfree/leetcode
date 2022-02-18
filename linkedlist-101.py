@@ -224,9 +224,114 @@ class Solution:
         return head
 
     def oddEvenList(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        if head is None:
+            return None
+        if head.next is None:
+            return head
+        if head.next.next is None:
+            return head
+        temp: ListNode = head
+        second = head.next
+        second_eternal = head.next
+        while temp.next is not None:
+            dum = temp.next
+            temp.next = dum.next
+            second.next = dum
+            second = dum
+            if temp.next is None:
+                break
+            temp = temp.next
+        second.next = None
+        temp.next = second_eternal
+        return head
+
+    def isPalindromeSimple(self, head: Optional[ListNode]) -> bool:
+        res = []
+        temp = head
+        while temp is not None:
+            res.append(temp.val)
+            temp = temp.next
+        return res == reversed(res)
+
+    def isPalindrome(self, head: Optional[ListNode]) -> bool:
+        """
+        There are approach to solve this problem with O(n) time complexity
+        and O(1) space complexity.
+        We are using technique as in the finding middle element approach,
+        but we also reverse links with slow pointer. Then, we go to
+        different sides of the list and check if values are equal. If at least
+        one value is not equal to another, we return False, otherwise we return True.
+
+        Although, there are one problem with this solution. At the end of the day, we
+            recieve a half-reversed linked list, which makes impossible to work with it
+            after we use this method.
+        """
+        if not head or not head.next:
+            return True
+
+        fast = head
+        temp = head
+        dummy = None
+        even = False
+        while fast.next is not None:
+            # print(fast)
+            fast = fast.next.next
+            one = temp.next
+            temp.next = dummy
+            dummy = temp
+            temp = one
+            if fast is None:
+                even = True
+                break
+        if not even:
+            temp = temp.next
+
+        while temp is not None:
+            if temp.val != dummy.val:
+                return False
+            temp = temp.next
+            dummy = dummy.next
+        return True
 
 
+def test_palindrome():
+    a = ListNode(1)
+    # b = ListNode(1)
+    # c = ListNode(1)
+    # d = ListNode(1)
+    # e = ListNode(2)
+    # f = ListNode(1)
+    # g = ListNode(1)
+    # a.next = b
+    b.next = c
+    # c.next = d
+    # d.next = e
+    # e.next = f
+    # f.next = g
 
+    sol = Solution()
+    a = sol.isPalindrome(a)
+    print('a is ', a)
+
+
+def test_oddeven():
+    a = ListNode(1)
+    b = ListNode(2)
+    c = ListNode(3)
+    d = ListNode(4)
+    e = ListNode(5)
+    f = ListNode(6)
+    g = ListNode(7)
+    a.next = b
+    b.next = c
+    c.next = d
+    d.next = e
+    e.next = f
+    f.next = g
+
+    sol = Solution()
+    res = sol.oddEvenList(e)
+    print('Thats it')
 
 
 def test_remove():
@@ -278,7 +383,7 @@ def test_cycle():
 
 
 if __name__ == "__main__":
-    test_remove()
+    test_palindrome()
 
     # a = {}
     # a[1] = 2
