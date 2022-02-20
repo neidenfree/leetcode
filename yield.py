@@ -1,3 +1,28 @@
+import time
+import sys
+
+def timeit(f):
+    def timed(*args, **kw):
+        ts = time.time()
+        result = f(*args, **kw)
+        te = time.time()
+        print('func:%r args:[%r, %r] took: %2.4f sec' % (f.__name__, args, kw, te - ts))
+        return result
+
+    return timed
+
+
+def basic_try_except(f):
+    def wrap(*args, **kwargs):
+        try:
+            result = f(*args, **kwargs)
+            return result
+        except Exception as e:
+            print(f'Function "{f.__name__}" has an exception with message: {e}')
+
+    return wrap
+
+
 class PowTwo:
     def __init__(self, max=0):
         self.max = max
@@ -147,9 +172,61 @@ class RangeIterator:
         raise StopIteration
 
 
+# There are one of cases, when iterators come handy: reading a lot of files
+@timeit
+def file_reader(filename: str):
+    for row in open(filename, 'r'):
+        yield row
+
+
+@timeit
+def dumb_file_reader(filename: str):
+    f = open(filename, 'r')
+    return f.read().split('\n')
+
+
+@basic_try_except
+def fuckup(n: int):
+    print(fuckup.__name__)
+    return n / 0
+
+
+def infinite_sequence():
+    num = 0
+    while True:
+        num += 1
+        yield num
+
+
+
 if __name__ == "__main__":
 
-    pass
+    # for i in infinite_sequence():
+    #     print(i, end=' ')
+
+    n = 5000
+    l = (x**2 for x in range(n))
+    l2 = [x**2 for x in range(n)]
+
+    print(sys.getsizeof(l))
+    print(sys.getsizeof(l2))
+
+    a = 500
+
+
+
+    # filename = 'C:\\Users\\Andrei\\Desktop\\some.txt'
+    # count = 0
+    # for line in file_reader(filename):
+    #     count += 1
+    # count_dumb = len(dumb_file_reader(filename))
+    # assert count == count_dumb
+
+
+
+
+    # for line in file_reader(filename):
+    #     count += 1
 
 # for i in range(5):
 #     some(i)
