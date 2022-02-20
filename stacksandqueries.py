@@ -48,7 +48,7 @@ class Stack:
     def pop(self) -> Optional[int]:
         if self.head is None:
             raise IndexError("Stack is shorter than you expect")
-        temp = self.
+        temp = self.head
         self.head = self.head.next
         self.count -= 1
         return temp.value
