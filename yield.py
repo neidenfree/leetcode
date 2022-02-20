@@ -27,7 +27,8 @@ class MyList:
         self._ar.append(val)
 
     def __iter__(self):
-        return ListIterator(self)
+        for element in self._ar:
+            yield element
 
     def __len__(self):
         return len(self._ar)
@@ -63,13 +64,13 @@ class ListNode:
 
 
 class LinkedList:
+
     def __init__(self, **kwargs):
         self.head = None
         self.count = 0
 
         if 'list' in kwargs:
             for el in reversed(kwargs['list']):
-                # print(el)
                 self.push(el)
 
     def push(self, obj: object):
@@ -89,7 +90,13 @@ class LinkedList:
         return res
 
     def __iter__(self):
-        return LinkedListIterator(self.head)
+        temp = self.head
+        while temp is not None:
+            res = temp.val
+            temp = temp.link
+            yield res
+
+        # return LinkedListIterator(self.head)
 
 
 class LinkedListIterator:
@@ -104,13 +111,55 @@ class LinkedListIterator:
         raise StopIteration
 
 
-ll = LinkedList(list=[1, 2, 3, 4, 5])
+def some(n: int):
+    print(f'{n} in some func')
+    yield n + 1
 
-for el in ll:
-    print(el)
-# print(ll)
 
-# a = MyList(ar=[1, 2, 3, 4, 5])
-# it = iter(a)
-# for el in a:
-#     print(el)
+def rev_str(string: str) -> str:
+    for c in reversed(string):
+        yield c
+
+
+class Range:
+    def __init__(self, start: int, end: int, step: int = 1):
+        self.start = start
+        self.end = end
+        self.step = step
+        self.index = start
+
+    def __iter__(self):
+        return RangeIterator(self.start, self.end, self.step)
+
+
+class RangeIterator:
+    def __init__(self, start: int, end: int, step: int = 1):
+        self.start = start
+        self.end = end
+        self.step = step
+        self.index = start
+
+    def __next__(self):
+        if self.index < self.end:
+            res = self.index
+            self.index += self.step
+            return res
+        raise StopIteration
+
+
+if __name__ == "__main__":
+
+    pass
+
+# for i in range(5):
+#     some(i)
+# a = some(5)
+# for i in some(5):
+#     print(i)
+# print(next(a))
+# print(next(a))
+# print(next(a))
+# print(next(a))
+# print(next(a))
+# print(next(a))
+# print(next(a))
