@@ -6,13 +6,22 @@ class Graph:
     def __init__(self, **kwargs):
         if 'matrix' in kwargs:
             self.m = kwargs['matrix']
-            self.g = self.get_graph_dict()
+            self.g = self.get_graph_from_matrix()
         if 'dict' in kwargs:
             self.g = kwargs['dict']
-            self.m = self.get_matrix()
+            # self.m = self.get_matrix()
         if 'string' in kwargs:
             self.s: str = kwargs['string']
             self.g = self.get_graph_dict_from_string()
+        if 'edges' in kwargs:
+            self.e = kwargs['edges']
+            self.g = self.get_graph_from_edges()
+        if 'incidence_matrix' in kwargs:
+            self.im = kwargs['incidence_matrix']
+            self.g = self.get_graph_from_incidence_matrix()
+        if 'laplacian' in kwargs:
+            self.laplacian = kwargs['laplacian']
+            self.g = self.get_graph_from_laplacian()
 
     def __str__(self):
         g = self.g
@@ -20,14 +29,6 @@ class Graph:
         for key in g:
             s += f'{key}: {g[key]}\n'
         return s
-
-    def get_graph_dict(self) -> Optional[dict]:
-        if len(self.m) == 0:
-            return None
-        d = {}
-        for i, vertex in enumerate(self.m):
-            d[i] = [x for x in range(len(vertex)) if vertex[x] == 1]
-        return d
 
     def path_exists(self, ind1: int, ind2: int) -> bool:
         g = self.g
@@ -106,11 +107,26 @@ class Graph:
         if start not in path:
             return None
         path.reverse()
-        print(prev)
         return path
 
     def get_matrix(self):
         g = self.g
+
+    def get_graph_from_matrix(self) -> Optional[dict]:
+        if len(self.m) == 0:
+            return None
+        d = {}
+        for i, vertex in enumerate(self.m):
+            d[i] = [x for x in range(len(vertex)) if vertex[x] == 1 and i != x]
+        return d
+
+    def get_graph_from_laplacian(self) -> Optional[dict]:
+        if len(self.laplacian) == 0:
+            return None
+        d = {}
+        for i, vertex in enumerate(self.laplacian):
+            d[i] = [x for x in range(len(vertex)) if vertex[x] == -1]
+        return d
 
     def get_graph_dict_from_string(self) -> dict:
         s = self.s
@@ -137,10 +153,61 @@ class Graph:
                     g[two] = [one]
         return g
 
+    def get_graph_from_edges(self) -> dict:
+        edges = self.e
+        g = {}
+        for edge in edges:
+            if edge[0] in g:
+                g[edge[0]].append(edge[1])
+            else:
+                g[edge[0]] = [edge[1]]
+            if edge[1] in g:
+                g[edge[1]].append(edge[0])
+            else:
+                g[edge[1]] = [edge[0]]
+        return g
+
+    def get_graph_from_incidence_matrix(self) -> dict:
+        im = self.im
+        g = {}
+        print([row[1] for row in im])
+        return g
+
+    def distance(self, ind1: int, ind2: int):
+        d = self.get_path(ind1, ind2)
+        if d is None:
+            return 0
+        return len(self.get_path(ind1, ind2)) - 1
+
+    def eccentricity(self, ind: int):
+        g = self.g
+        ec = 0
+        for i in range(len(g)):
+            ec = max(ec, self.distance(ind, i))
+        return ec
+
+    def diameter(self):
+        return max((self.eccentricity(x) for x in range(len(self.g))))
+
+    def radius(self):
+        return min((self.eccentricity(x) for x in range(len(self.g))))
+
+    def center(self):
+        r = self.radius()
+        return [x for x in range(len(self.g)) if self.eccentricity(x) == r]
+
+# g = self.g
+# r = 100000
+# d = 0
+# for i in range(len(g)):
+#     for j in range(len(g)):
+#         if i != j:
+#             d = max(d, self.distance(i, j))
+#     r = min(r, d)
+# return r
+
 
 if __name__ == '__main__':
-    graph = Graph(string='0,1; 0,4; 0,2;  4,2; 2,3; 2,6; 2,5; 7')
-
     # graph = Graph(matrix=[
     # [0, 1, 1, 0, 0],
     # [1, 0, 0, 1, 0],
@@ -159,10 +226,50 @@ if __name__ == '__main__':
     #     5: [2],
     #     6: [2]
     # })
-    ind1, ind2 = 6, 4
-    print(f'path from {ind1} to {ind2} =', graph.get_path(ind1, ind2))
 
+    # graph = Graph(string='0,1; 0,4; 0,2;  4,2; 2,3; 2,6; 2,5; 7')
+    # graph = Graph(edges=[
+    #     [1, 0], [0, 4], [4, 2], [0, 2], [2, 3], [2, 6], [2, 5]
+    # ])
+    # graph = Graph(incidence_matrix=[
+    #     [1, 1, 1, 0, 0, 0, 0],
+    #     [1, 0, 0, 0, 0, 0, 0],
+    #     [0, 0, 1, 1, 1, 1, 1],
+    #     [0, 0, 0, 0, 1, 0, 0],
+    #     [0, 1, 0, 1, 0, 0, 0],
+    #     [0, 0, 0, 0, 0, 0, 1],
+    #     [0, 0, 0, 0, 0, 1, 0],
+    # ])
+
+    graph = Graph(laplacian=[
+        [3, -1, -1, 0, -1, 0, 0],
+        [-1, 1, 0, 0, 0, 0, 0],
+        [-1, 0, 5, -1, -1, -1, -1],
+        [0, 0, -1, 1, 0, 0, 0],
+        [-1, 0, -1, 0, 0, 0, 0],
+        [0, 0, -1, 0, 0, 1, 0],
+        [0, 0, -1, 0, 0, 0, 1]
+    ])
+    #
+    # graph2 = Graph(matrix=[
+    #     [1, 1, 1, 0, 1, 0, 0],
+    #     [1, 1, 0, 0, 0, 0, 0],
+    #     [1, 0, 1, 1, 1, 1, 1],
+    #     [0, 0, 1, 1, 0, 0, 0],
+    #     [1, 0, 1, 0, 1, 0, 0],
+    #     [0, 0, 1, 0, 0, 1, 0],
+    #     [0, 0, 1, 0, 0, 0, 1],
+    # ])
+
+    # graph = Graph(string="0,1; 0,3; 1,2; 2,3; 3,4")
+
+    # ind1, ind2 = 6, 3
+    # print(f'path from {ind1} to {ind2} =', graph.get_path(ind1, ind2))
+    print(f'The diameter of the graph is {graph.diameter()}')
+    print(f'The radius of the graph is {graph.radius()}')
+    print(f'The center of the graph is {graph.center()}')
     print(graph)
+    # print(graph2)
 
     # print(get_path(0, 3, g))
     # assert path_exists(0, 2, g)
