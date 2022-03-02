@@ -168,6 +168,7 @@ class Graph:
         return g
 
     def get_graph_from_incidence_matrix(self) -> dict:
+        # TODO: Finalize this
         im = self.im
         g = {}
         print([row[1] for row in im])
@@ -195,6 +196,42 @@ class Graph:
     def center(self):
         r = self.radius()
         return [x for x in range(len(self.g)) if self.eccentricity(x) == r]
+
+    def bfs(self, start: int) -> Optional[List[int]]:
+        g = self.g
+        l = deque()
+        l.append(start)
+        res = []
+        visited = [False for _ in range(len(g))]
+        while len(l) is not None:
+            el = l.popleft()
+            if not visited[el]:
+                res.append(el)
+            visited[el] = True
+            for elem in g[el]:
+                if not visited[elem]:
+                    l.append(elem)
+            if len(l) == 0:
+                break
+        return res
+
+    def dfs_help(self, res: List[int], visited: List[bool], v: int):
+        visited[v] = True
+        res.append(v)
+        for el in self.g[v]:
+            if not visited[el]:
+                self.dfs_help(res, visited, el)
+
+    def dfs(self, start: int) -> Optional[List[int]]:
+        visited = [False for x in range(len(self.g))]
+        res = []
+        self.dfs_help(res, visited, start)
+        return res
+
+    def spanning_tree(self):
+
+        pass
+
 
 # g = self.g
 # r = 100000
@@ -268,6 +305,8 @@ if __name__ == '__main__':
     print(f'The diameter of the graph is {graph.diameter()}')
     print(f'The radius of the graph is {graph.radius()}')
     print(f'The center of the graph is {graph.center()}')
+    print(f'The BFS of the graph is {graph.bfs(3)}')
+    print(f'The DFS of the graph is {graph.dfs(3)}')
     print(graph)
     # print(graph2)
 
