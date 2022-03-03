@@ -1,3 +1,6 @@
+from __future__ import annotations  # Необходимо, для того чтобы можно было написать type hint для метода класса,
+# который возвращает объект класса
+
 from typing import List, Optional
 from collections import deque
 
@@ -228,9 +231,36 @@ class Graph:
         self.dfs_help(res, visited, start)
         return res
 
-    def spanning_tree(self):
+    def spanning_tree(self) -> Graph:
+        """
+            Найти остовное дерево графа, используя поиск в ширину
+        """
+        g = self.g
+        l = deque()
+        start = 0
+        l.append(start)
+        res = []
+        visited = [False for _ in range(len(g))]
+        found = [False for _ in range(len(g))]
+        graph_str = ""
+        while len(l) is not None:
+            el = l.popleft()
+            if not visited[el]:
+                res.append(el)
+            visited[el] = True
+            for elem in g[el]:
+                if not visited[elem]:
+                    l.append(elem)
+                if not found[elem] or not found[el]:
+                    graph_str += f"{elem},{el};"
+                    found[elem] = True
+                    found[el] = True
 
-        pass
+            if len(l) == 0:
+                break
+        if len(graph_str) != 0:
+            graph_str = graph_str[:-1]
+        return Graph(string=graph_str)
 
 
 # g = self.g
@@ -278,15 +308,15 @@ if __name__ == '__main__':
     #     [0, 0, 0, 0, 0, 1, 0],
     # ])
 
-    graph = Graph(laplacian=[
-        [3, -1, -1, 0, -1, 0, 0],
-        [-1, 1, 0, 0, 0, 0, 0],
-        [-1, 0, 5, -1, -1, -1, -1],
-        [0, 0, -1, 1, 0, 0, 0],
-        [-1, 0, -1, 0, 0, 0, 0],
-        [0, 0, -1, 0, 0, 1, 0],
-        [0, 0, -1, 0, 0, 0, 1]
-    ])
+    # graph = Graph(laplacian=[
+    #     [3, -1, -1, 0, -1, 0, 0],
+    #     [-1, 1, 0, 0, 0, 0, 0],
+    #     [-1, 0, 5, -1, -1, -1, -1],
+    #     [0, 0, -1, 1, 0, 0, 0],
+    #     [-1, 0, -1, 0, 2, 0, 0],
+    #     [0, 0, -1, 0, 0, 1, 0],
+    #     [0, 0, -1, 0, 0, 0, 1]
+    # ])
     #
     # graph2 = Graph(matrix=[
     #     [1, 1, 1, 0, 1, 0, 0],
@@ -298,7 +328,10 @@ if __name__ == '__main__':
     #     [0, 0, 1, 0, 0, 0, 1],
     # ])
 
+    # graph = Graph(string="0,1; 0,4; 0,2; 4,2; 2,3; 2,5; 2,6")
+
     # graph = Graph(string="0,1; 0,3; 1,2; 2,3; 3,4")
+    graph = Graph(string="0,1; 0,4; 1,4; 3,5; 0,2; 4,2; 2,3; 2,5; 2,6")
 
     # ind1, ind2 = 6, 3
     # print(f'path from {ind1} to {ind2} =', graph.get_path(ind1, ind2))
@@ -306,8 +339,11 @@ if __name__ == '__main__':
     print(f'The radius of the graph is {graph.radius()}')
     print(f'The center of the graph is {graph.center()}')
     print(f'The BFS of the graph is {graph.bfs(3)}')
-    print(f'The DFS of the graph is {graph.dfs(3)}')
+    span = graph.spanning_tree()
+    print('Граф:')
     print(graph)
+    print('Остовное дерево для графа:')
+    print(span)
     # print(graph2)
 
     # print(get_path(0, 3, g))
