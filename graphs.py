@@ -1,8 +1,9 @@
 from __future__ import annotations  # Необходимо, для того чтобы можно было написать type hint для метода класса,
 # который возвращает объект класса
 
-from typing import List, Optional
+from typing import List, Optional, Union, Tuple
 from collections import deque
+import numpy as np
 
 
 class Graph:
@@ -83,7 +84,6 @@ class Graph:
             raise IndexError("Negative index!")
         if start >= len(self.g) or end >= len(self.g):
             raise IndexError('One of indices is greater then count of vertices!')
-
         g = self.g
         l = deque()
         l.append(start)
@@ -120,7 +120,7 @@ class Graph:
             return None
         d = {}
         for i, vertex in enumerate(self.m):
-            d[i] = [x for x in range(len(vertex)) if vertex[x] == 1 and i != x]
+            d[i] = [x for x in range(len(vertex)) if vertex[x] != 0 and i != x]
         return d
 
     def get_graph_from_laplacian(self) -> Optional[dict]:
@@ -262,6 +262,65 @@ class Graph:
             graph_str = graph_str[:-1]
         return Graph(string=graph_str)
 
+    def count_of_spanning_trees(self):
+        """
+            Для начала, необходимо найти матрицу Кирхгофа
+        """
+        laplacian = self.get_laplacian()
+        del laplacian[0]
+        for row in laplacian:
+            del row[0]
+        return np.linalg.det(laplacian)
+
+    def get_laplacian(self):
+        g = self.g
+        laplacian = [[0 for _ in range(len(g))] for _ in range(len(g))]
+        for key in g:
+            laplacian[key][key] = len(g[key])
+            for index in g[key]:
+                laplacian[key][index] = -1
+        return laplacian
+
+    def shortest_path(self, start: int, end: int) -> Tuple[Optional[List[int]], int]:
+        if self.m is None:
+            return None
+        m = self.m
+        matrix_print(m)
+
+        inf = 9999999999
+        visited = [False for _ in range(len(m))]
+        prev = [None for _ in range(len(m))]
+        dist = [inf for _ in range(len(self.g))]
+        dist[start] = 0
+        l = deque()
+        l.append(start)
+        while len(l) != 0:
+            current = l.popleft()
+            visited[current] = True
+            for child in range(len(m[current])):
+                if m[current][child] != 0:
+                    if not visited[child]:
+                        l.append(child)
+                    if m[current][child] + dist[current] < dist[child]:
+                        dist[child] = m[current][child] + dist[current]
+                        prev[child] = current
+
+        path = []
+        temp = end
+        while temp is not None:
+            path.append(temp)
+            temp = prev[temp]
+        path.reverse()
+
+        return path, dist[end]
+
+
+def matrix_print(matrix: List[List[int]]):
+    for row in matrix:
+        for col in row:
+            print("{:4}".format(col), end='')
+        print()
+
 
 # g = self.g
 # r = 100000
@@ -331,19 +390,34 @@ if __name__ == '__main__':
     # graph = Graph(string="0,1; 0,4; 0,2; 4,2; 2,3; 2,5; 2,6")
 
     # graph = Graph(string="0,1; 0,3; 1,2; 2,3; 3,4")
-    graph = Graph(string="0,1; 0,4; 1,4; 3,5; 0,2; 4,2; 2,3; 2,5; 2,6")
+    # graph = Graph(string="0,1; 0,4; 1,4; 3,5; 0,2; 4,2; 2,3; 2,5; 2,6")
+    # graph = Graph(string="0,1; 0,2; 0,6; 1,2; 2,3; 2,4; 3,4; 3,5; 4,6")
+    graph = Graph(matrix=[
+        # 0  1  2  3  4  5  6
+        [0, 6, 2, 0, 0, 0, 8],  # 0
+        [6, 0, 1, 0, 0, 0, 0],  # 1
+        [2, 1, 0, 4, 3, 0, 0],  # 2
+        [0, 0, 4, 0, 5, 1, 0],  # 3
+        [0, 0, 3, 5, 0, 0, 2],  # 4
+        [0, 0, 0, 1, 0, 0, 0],  # 5
+        [8, 0, 0, 0, 2, 0, 0],  # 6
+    ])
 
-    # ind1, ind2 = 6, 3
-    # print(f'path from {ind1} to {ind2} =', graph.get_path(ind1, ind2))
-    print(f'The diameter of the graph is {graph.diameter()}')
-    print(f'The radius of the graph is {graph.radius()}')
-    print(f'The center of the graph is {graph.center()}')
-    print(f'The BFS of the graph is {graph.bfs(3)}')
-    span = graph.spanning_tree()
+    # print(f'The diameter of the graph is {graph.diameter()}')
+    # print(f'The radius of the graph is {graph.radius()}')
+    # print(f'The center of the graph is {graph.center()}')
+    # print(f'The BFS of the graph is {graph.bfs(3)}')
+    # span = graph.spanning_tree()
     print('Граф:')
     print(graph)
-    print('Остовное дерево для графа:')
-    print(span)
+    # print('Остовное дерево для графа:')
+    # print(span)
+    ind1, ind2 = 3, 0
+    pl = 0
+    path, path_length = graph.shortest_path(ind1, ind2)
+    print(f'Shortest path from {ind1} to {ind2} is {path}, its length is equal to {path_length}')
+    # print('Quantity of spanning trees: ', graph.count_of_spanning_trees())
+
     # print(graph2)
 
     # print(get_path(0, 3, g))
