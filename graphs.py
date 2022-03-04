@@ -314,6 +314,89 @@ class Graph:
 
         return path, dist[end]
 
+    def dfs_iter(self, start: int, end: int) -> Optional[List[int]]:
+        """To start, let's implement depth-first search using iterations, not recursion"""
+        l = deque()
+        l.append(start)
+        visited = [False for _ in range(len(self.g))]
+
+        while len(l) != 0:
+            current = l.pop()
+            if not visited[current]:
+                print(current)
+            visited[current] = True
+            for child in self.g[current]:
+                if not visited[child]:
+                    l.append(child)
+        path = []
+        return path
+
+    def minimum_spanning_tree(self) -> Optional[Graph]:
+        m = self.m
+        edges = []
+        for i in range(len(m)):
+            for j in range(i, len(m)):
+                if i != j and m[i][j] != 0:
+                    edges.append([i, j, m[i][j]])
+        for i in range(len(edges)):
+            for j in range(i, len(edges)):
+                if edges[i][2] > edges[j][2]:
+                    edges[i], edges[j] = edges[j], edges[i]
+        final_edges = []
+        components = []
+        for edge in edges:
+            if len(final_edges) == 0:
+                final_edges.append(edge)
+                components.append([edge[0], edge[1]])
+                continue
+
+            for l in range(len(components)):
+                if edge[0] in components[l] and edge[1] in components[l]:
+                    break
+                elif edge[0] in components[l]:
+                    # check if edge[1] in other components
+                    found = False
+                    for z in range(len(components)):
+                        if z == l:
+                            continue
+                        if edge[1] in components[z]:
+                            components[l].extend(components[z])
+                            final_edges.append(edge)
+                            del components[z]
+                            found = True
+                            break
+                    if not found:
+                        components[l].append(edge[1])
+                        final_edges.append(edge)
+                    break
+                elif edge[1] in components[l]:
+                    # check if edge[1] in other components
+                    found = False
+                    for z in range(len(components)):
+                        if z == l:
+                            continue
+                        if edge[0] in components[z]:
+                            components[l].extend(components[z])
+                            final_edges.append(edge)
+                            del components[z]
+                            found = True
+                            break
+                    if not found:
+                        components[l].append(edge[0])
+                        final_edges.append(edge)
+                    break
+                else:
+                    components.append([edge[0], edge[1]])
+                    final_edges.append(edge)
+                    break
+        # Делаем матрицу смежности и возвращаем новый граф
+        mat = [[0 for x in range(len(m))] for x in range(len(m))]
+        for edge in final_edges:
+            mat[edge[0]][edge[1]] = edge[2]
+            mat[edge[1]][edge[0]] = edge[2]
+        return Graph(matrix=mat)
+
+
 
 def matrix_print(matrix: List[List[int]]):
     for row in matrix:
@@ -412,13 +495,26 @@ if __name__ == '__main__':
     print(graph)
     # print('Остовное дерево для графа:')
     # print(span)
-    ind1, ind2 = 3, 0
+    ind1, ind2 = 0, 5
     pl = 0
-    path, path_length = graph.shortest_path(ind1, ind2)
-    print(f'Shortest path from {ind1} to {ind2} is {path}, its length is equal to {path_length}')
-    # print('Quantity of spanning trees: ', graph.count_of_spanning_trees())
+    # path, path_length = graph.shortest_path(ind1, ind2)
+    # print(f'Shortest path from {ind1} to {ind2} is {path}, its length is equal to {path_length}')
+    # print(f'Shortest path from {ind1} to {ind2} is {path}, its length is equal to {path_length}')
 
+    # print('Quantity of spanning trees: ', graph.count_of_spanning_trees())
+    # graph.dfs_iter(0, 5)
     # print(graph2)
+
+    # graph = Graph(matrix=[
+    #     [0, 0, 13, 19, 0, 0, 0],
+    #     [0, 0, 20, 4, 15, 0, 0],
+    #     [13, 20, 0, 0, 0, 0, 0],
+    #     [19, 4, 0, 0, 0, 0, 17],
+    #     [0, 15, 0, 0, 0, 22, 8],
+    #     [0, 0, 0, 0, 22, 0, 10],
+    #     [0, 0, 0, 17, 8, 10, 0]
+    # ])
+    print(graph.minimum_spanning_tree())
 
     # print(get_path(0, 3, g))
     # assert path_exists(0, 2, g)
