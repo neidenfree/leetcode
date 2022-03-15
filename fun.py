@@ -1,3 +1,8 @@
+from typing import List
+
+from utils import test_equal
+
+
 def spiral_matrix(n: int):
     def print_mat(mat) -> None:
         for i in range(len(mat)):
@@ -51,5 +56,84 @@ def spiral_matrix(n: int):
     return mat
 
 
+class Solution:
+    def strStr(self, haysack: str, needle: str) -> int:
+        if len(needle) > len(haysack):
+            return -1
+        if len(needle) == len(haysack):
+            if needle == haysack:
+                return 0
+            else:
+                return -1
+        if len(needle) == 0:
+            return 0
+
+        for i in range(len(haysack) - len(needle) + 1):  # maybe even -1
+            if haysack[i:i + len(needle)] == needle:
+                return i
+        return -1
+
+    def lengthOfLastWord(self, s: str) -> int:
+        last = ''
+        for x in s.split(' '):
+            if x != '':
+                last = x
+        return len(last)
+
+    def plusOne(self, digits: List[int]) -> List[int]:
+        if digits[-1] != 9:
+            digits[-1] += 1
+            return digits
+        rem = 0
+        for i in reversed(range(0, len(digits))):
+            if digits[i] == 9:
+                digits[i] = 0
+                rem = 1
+            else:
+                digits[i] += rem
+                rem = 0
+                break
+        if rem != 0:
+            digits.insert(0, rem)
+        return digits
+
+
+
+
+def length_of_last_word_test():
+    a = Solution()
+    test_equal(a.lengthOfLastWord, 5, "Hello World")
+    test_equal(a.lengthOfLastWord, 4, "   fly me   to   the moon  ")
+    test_equal(a.lengthOfLastWord, 6, "luffy is still joyboy")
+    test_equal(a.lengthOfLastWord, 1, "luffy is still joyboay z")
+    test_equal(a.lengthOfLastWord, 1, "luffy is still joyboay z")
+
+
+def test_plus_one():
+    a = Solution()
+    test_equal(a.plusOne, [9, 9], [9, 8], list_check=True, verbose=0)
+    test_equal(a.plusOne, [3], [2], list_check=True, verbose=0)
+    test_equal(a.plusOne, [1, 1, 0], [1, 0, 9], verbose=0, list_check=True)
+    test_equal(a.plusOne, [1, 9, 1], [1, 9, 0], verbose=0, list_check=True)
+    test_equal(a.plusOne, [1, 0], [9], verbose=0, list_check=True)
+
+
+def str_str_test():
+    a = Solution()
+    test_equal(a.strStr, 2, 'hell', 'll', verbose=0)
+    test_equal(a.strStr, 0, 'llhell', 'll', verbose=0)
+    test_equal(a.strStr, 0, 'aaaksjdhsakj', 'aa')
+    test_equal(a.strStr, 0, 'aaaksjdhsakj', 'aa')
+    test_equal(a.strStr, 6, 'aaaksjzbzdhsakj', 'zbz')
+    test_equal(a.strStr, -1, '2', 'zbz')
+    test_equal(a.strStr, 4, "mississippi", "issip")
+
+    # test_equal(a.strStr, 2, 'hello', 'll')
+    # test_equal(a.strStr, 2, 'hello', 'll')
+    # test_equal(a.strStr, 2, 'hello', 'll')
+
+
 if __name__ == "__main__":
-    spiral_matrix(3)
+    test_plus_one()
+    # str_str_test()
+    # length_of_last_word_test()

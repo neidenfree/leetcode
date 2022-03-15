@@ -2,24 +2,20 @@
 # write a function to search target in nums. If target exists, then return its index. Otherwise, return -1.
 # You must write an algorithm with O(log n) runtime complexity.
 from typing import List
+from utils import test_equal
 
 
-def test_equal(f, result, *args, **kwargs):
-    if 'verbose' in kwargs:
-        if kwargs['verbose'] == 0:
-            pass
-        elif kwargs['verbose'] == 1:
-            print(*args)
-            print(f(*args))
-        elif kwargs['verbose'] == 2:
-            print(f'''
-                    Test for function "{f.__name__}".
-                    Arguments = {args},
-                    expected result = {result}
-                    real result = {f(*args)}
-                ''')
+# import matplotlib.pyplot as plt
 
-    assert f(*args) == result
+
+def rotate_list(nums: List[int], k: int) -> List[int]:
+    return nums[k:] + nums[:k]
+
+
+def test_rotate_list():
+    test_equal(rotate_list, [3, 4, 5, 1, 2], [1, 2, 3, 4, 5], 2)
+    test_equal(rotate_list, [4, 5, 1, 2, 3], [1, 2, 3, 4, 5], 3)
+    test_equal(rotate_list, [5, 1, 2, 3, 4], [1, 2, 3, 4, 5], 4)
 
 
 def guess(num: int) -> int:
@@ -171,6 +167,154 @@ class Solution:
                 left = mid + 1
         return left
 
+    def binary_search_template_2(self, nums: List[int], target: int) -> int:
+        if len(nums) == 0:
+            return -1
+        left, right = 0, len(nums)
+        while left < right:
+            mid = (left + right) // 2
+            if nums[mid] == target:
+                return mid
+            if nums[mid] < target:
+                left = mid + 1
+            else:
+                right = mid
+
+        if left != len(nums) and nums[left] == target:
+            return left
+        return -1
+
+    def findMin(self, nums: List[int]) -> int:
+        if len(nums) == 0:
+            return -1
+        if len(nums) == 1:
+            return nums[0]
+        if len(nums) == 2:
+            return min(nums)
+
+        minimum = nums[0]
+        left, right = 0, len(nums) - 1
+        while left < right:
+            mid = (left + right) // 2
+            if nums[mid] < minimum:
+                minimum = nums[mid]
+            elif nums[left] < nums[right]:
+                if nums[left] < minimum:
+                    minimum = nums[left]
+                break
+            elif nums[mid] > nums[left]:
+                left = mid + 1
+            elif nums[mid] < nums[right]:
+                right = mid - 1
+            else:
+                minimum = min(nums[left], nums[right], minimum)
+                break
+        if nums[left] < minimum:
+            minimum = nums[left]
+        return minimum
+
+    def binary_search_template_3(self, nums: List[int], target: int) -> int:
+        if len(nums) == 0:
+            return -1
+        left, right = 0, len(nums) - 1
+        while left + 1 < right:
+            mid = (left + right) // 2
+            if nums[mid] == target:
+                return mid
+            elif nums[mid] < target:
+                left = mid
+            else:
+                right = mid
+        if nums[left] == target:
+            return left
+        if nums[right] == target:
+            return right
+        return -1
+
+    def searchRange(self, nums: List[int], target: int) -> List[int]:
+        if len(nums) == 0:
+            return [-1, -1]
+        if len(nums) == 1:
+            if nums[0] == target:
+                return [0, 0]
+        if len(nums) == 2:
+            if nums[0] == target and nums[1] == target:
+                return [0, 1]
+            if nums[0] == target and nums[1] != target:
+                return [0, 0]
+            if nums[0] != target and nums[1] == target:
+                return [1, 1]
+            if nums[0] != target and nums[1] != target:
+                return [-1, -1]
+
+        left, right = 0, len(nums) - 1
+        while left < right:
+            mid = (left + right) // 2
+            if nums[mid] == target:
+                left, right = mid, mid
+                while left >= 0 and nums[left] == target:
+                    left -= 1
+                while right < len(nums) and nums[right] == target:
+                    right += 1
+                return [left + 1, right - 1]
+            elif target > nums[mid]:
+                left = mid + 1
+            else:
+                right = mid
+        if nums[left] == target:
+            return [left, left]
+        return [-1, -1]
+
+
+def search_range_test():
+    a = Solution()
+    verbose = 0
+    test_equal(a.searchRange, [1, 3], [1, 2, 2, 2, 3, 4, 5, 5, 5], 2, verbose=verbose)
+    test_equal(a.searchRange, [-1, -1], [1, 3, 4, 5, 5, 5], 2, verbose=verbose)
+    test_equal(a.searchRange, [-1, -1], [1, 5], 2, verbose=verbose)
+    test_equal(a.searchRange, [-1, -1], [1, 5], 2, verbose=verbose)
+    test_equal(a.searchRange, [0, 1], [1, 1], 1, verbose=verbose)
+    test_equal(a.searchRange, [0, 0], [1], 1, verbose=verbose)
+    test_equal(a.searchRange, [0, 2], [2, 2, 2, 3, 4, 5], 2, verbose=verbose)
+    test_equal(a.searchRange, [5, 7], [2, 2, 2, 3, 4, 5, 5, 5], 5, verbose=verbose)
+    test_equal(a.searchRange, [3, 6], [2, 2, 2, 3, 3, 3, 3, 4, 5, 5, 5], 3, verbose=verbose)
+    test_equal(a.searchRange, [-1, -1], [2, 2, 2, 3, 3, 3, 3, 4, 5, 5, 5], 6, verbose=verbose)
+    #
+    test_equal(a.searchRange, [0, 0], [1, 2, 3], 1, verbose=verbose)
+    test_equal(a.searchRange, [1, 1], [1, 2, 3], 2, verbose=verbose)
+    test_equal(a.searchRange, [2, 2], [1, 2, 3], 3, verbose=verbose)
+
+    test_equal(a.searchRange, [2, 2], [1, 2, 3], 3, verbose=verbose)
+
+
+
+
+
+def find_min_test():
+    import numpy as np
+
+    a = Solution()
+    verbose = 0
+    test_equal(a.findMin, -1, [])
+    test_equal(a.findMin, -10, [1, 2, 3, 6, 7, 8, -10, -8], verbose=verbose)
+    test_equal(a.findMin, -10, [1, 2, -10, -8], verbose=verbose)
+    test_equal(a.findMin, -10, [1, 2, -10, -8], verbose=verbose)
+    test_equal(a.findMin, -10, [1, 2, -10, -8], verbose=verbose)
+    test_equal(a.findMin, 1, [3, 4, 5, 1, 2], verbose=verbose)
+    test_equal(a.findMin, 11, [11, 13, 15, 17], verbose=verbose)
+    test_equal(a.findMin, 0, [4, 5, 6, 7, 0, 1, 2], verbose=verbose)
+    test_equal(a.findMin, 1, [2, 1], verbose=verbose)
+
+    test_equal(a.findMin, -10, [1, 2, 3, 4, 5, 6, -10], verbose=verbose)
+    fuck_list = [43, 48, 50, 53, 56, 68, 93, -96, -89, -77, -46, -37, -34, -7, -2, -1, 9, 40]
+    test_equal(a.findMin, -96, fuck_list, verbose=verbose)
+
+    for _ in range(100):
+        n = np.random.randint(10, 20)
+        random_list = sorted(list(set(np.random.randint(-100, 100, n))))
+        k = np.random.randint(1, 20)
+        test_equal(a.findMin, min(random_list), rotate_list(random_list, k), verbose=0)
+
 
 def peak_element_test():
     a = Solution()
@@ -239,7 +383,9 @@ def test_guess():
 
 
 if __name__ == "__main__":
-    peak_element_test()
+    search_range_test()
+    # find_min_test()
+    # peak_element_test()
     # first_bad_version_test()
     # test_search()
     # test_sqrt()

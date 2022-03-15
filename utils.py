@@ -1,4 +1,35 @@
+import collections
 from typing import List
+
+
+def compare_lists(a: List, b: List):
+    if len(a) != len(b):
+        return False
+    for i in range(len(a)):
+        if a[i] != b[i]:
+            return False
+    return True
+
+
+def test_equal(f, result, *args, **kwargs):
+    real_result = f(*args)
+    if 'verbose' in kwargs:
+        if kwargs['verbose'] == 0:
+            pass
+        elif kwargs['verbose'] == 1:
+            print(*args)
+            print(real_result)
+        elif kwargs['verbose'] == 2:
+            print(f'''
+                    Test for function "{f.__name__}".
+                    Arguments = {args},
+                    expected result = {result}
+                    real result = {real_result}
+                ''')
+    if "list_check" in kwargs:
+        assert compare_lists(real_result, result)
+    else:
+        assert f(*args) == result
 
 
 def right_result(right, result, **nums):
