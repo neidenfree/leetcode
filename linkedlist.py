@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 
 class ListNode:
@@ -46,6 +46,24 @@ def print_list(head: ListNode):
     while new_head:
         print(new_head)
         new_head = new_head.next
+
+
+def create_linked_list_from_array(nums: List[int]) -> Optional[ListNode]:
+    if nums is None or len(nums) == 0:
+        return None
+    first = ListNode(nums[0])
+    head = first
+
+    zz = True
+    for elem in nums:
+        if zz:
+            zz = False
+            continue
+        t = ListNode(elem)
+        first.next = t
+        first = t
+
+    return head
 
 
 class TreeNode:
@@ -152,16 +170,73 @@ class Solution:
                 p1 = p1.next.next
             p2 = p2.next
 
+    def mergeTwoLists(self, list1: Optional[ListNode], list2: Optional[ListNode]) -> Optional[ListNode]:
+        temp1 = list1
+        temp2 = list2
+        if temp1 is None and temp2 is None:
+            return None
 
-if __name__ == "__main__":
-    head = ListNode(5)
-    head = add_to_list(head, 4)
-    head = add_to_list(head, 3)
-    head = add_to_list(head, 2)
-    head = add_to_list(head, 1)
-    head = add_to_list(head, 5)
+        if temp1 is None:
+            return temp2
+        if temp2 is None:
+            return temp1
+
+        if temp1.val <= temp2.val:
+            res = ListNode(temp1.val)
+            temp1 = temp1.next
+        else:
+            res = ListNode(temp2.val)
+            temp2 = temp2.next
+
+        prev = res
+
+        while temp1 is not None or temp2 is not None:
+            if temp1 is None:
+                t = ListNode(temp2.val)
+                temp2 = temp2.next
+            elif temp2 is None:
+                t = ListNode(temp1.val)
+                temp1 = temp1.next
+            elif temp1.val <= temp2.val:
+                t = ListNode(temp1.val)
+                temp1 = temp1.next
+            elif temp1.val > temp2.val:
+                t = ListNode(temp2.val)
+                temp2 = temp2.next
+            res.next = t
+            res = t
+        return prev
+
+
+def test_merge_lists():
+    l1 = create_linked_list_from_array([])
+    l2 = create_linked_list_from_array([])
 
     a = Solution()
-    # print_list(Solution.middleNode(head=head))
-    n = 2
-    print_list(a.removeNthFromEnd(head=head, n=n))
+    res = a.mergeTwoLists(l1, l2)
+    print('Debug')
+
+
+def test_create_list():
+    t1 = create_linked_list_from_array([1, 2, 3, 4, 5])
+    t2 = create_linked_list_from_array([1])
+    t3 = create_linked_list_from_array([1, 2])
+    t4 = create_linked_list_from_array([])
+    print('Debug')
+
+
+
+if __name__ == "__main__":
+    test_merge_lists()
+    # test_create_list()
+    # head = ListNode(5)
+    # head = add_to_list(head, 4)
+    # head = add_to_list(head, 3)
+    # head = add_to_list(head, 2)
+    # head = add_to_list(head, 1)
+    # head = add_to_list(head, 5)
+    #
+    # a = Solution()
+    # # print_list(Solution.middleNode(head=head))
+    # n = 2
+    # print_list(a.removeNthFromEnd(head=head, n=n))
