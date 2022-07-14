@@ -97,7 +97,25 @@ class Solution:
             digits.insert(0, rem)
         return digits
 
+    def isPalindrome(self, s: str) -> bool:
+        s = s.lower()
+        cleaned = ''.join([x for x in s if x.isalnum()])
+        return cleaned == cleaned[::-1]
 
+    def singleNumber(self, nums: List[int]) -> int:
+        if len(nums) == 1:
+            return nums[0]
+
+        dic = {}
+        for el in nums:
+            if el in dic:
+                dic[el] += 1
+            else:
+                dic[el] = 1
+
+        for el in dic:
+            if dic[el] == 1:
+                return el
 
 
 def length_of_last_word_test():
@@ -133,7 +151,25 @@ def str_str_test():
     # test_equal(a.strStr, 2, 'hello', 'll')
 
 
+def test_single_number():
+    a = Solution()
+    assert a.singleNumber([2, 2, 1]) == 1
+    assert a.singleNumber([4, 1, 2, 1, 2]) == 4
+    assert a.singleNumber([1]) == 1
+
+
+def test_valid_palindrome():
+    a = Solution()
+    assert a.isPalindrome("A man, a plan, a canal: Panama")
+    assert not a.isPalindrome("race a car")
+    assert not a.isPalindrome("asdfghjl")
+    assert a.isPalindrome(" ")
+    assert not a.isPalindrome("0P")
+
+
 if __name__ == "__main__":
-    test_plus_one()
+    test_single_number()
+    # test_valid_palindrome()
+    # test_plus_one()
     # str_str_test()
     # length_of_last_word_test()
