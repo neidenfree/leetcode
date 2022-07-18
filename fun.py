@@ -117,8 +117,48 @@ class Solution:
             if dic[el] == 1:
                 return el
 
+    def addBinary(self, a: str, b: str) -> str:
+        a1 = int(a, 2)
+        b1 = int(b, 2)
+        c = a1 + b1
+        return str(bin(c))[2:]
 
-def length_of_last_word_test():
+    def getRow(self, rowIndex: int) -> List[int]:
+        if rowIndex == 0:
+            return [1]
+        if rowIndex == 1:
+            return [1, 1]
+        row = [1, 1]
+
+        for i in range(2, rowIndex + 1):
+            new_row = [1 for _ in range(i + 1)]
+            for j in range(len(row) - 1):
+                new_row[j + 1] = row[j] + row[j + 1]
+            row = new_row
+
+        return row
+
+
+def test_get_row():
+    a = Solution()
+    assert a.getRow(0) == [1]
+    assert a.getRow(1) == [1, 1]
+    assert a.getRow(2) == [1, 2, 1]
+    assert a.getRow(3) == [1, 3, 3, 1]
+    assert a.getRow(4) == [1, 4, 6, 4, 1]
+
+    print(a.getRow(33))
+
+
+def test_add_binary():
+    a = Solution()
+    assert a.addBinary("11", "1") == "100"
+    assert a.addBinary("1010", "1011") == "10101"
+    assert a.addBinary("10", "0") == "10"
+    assert a.addBinary("111", "11") == "1010"
+
+
+def test_length_of_last_word():
     a = Solution()
     test_equal(a.lengthOfLastWord, 5, "Hello World")
     test_equal(a.lengthOfLastWord, 4, "   fly me   to   the moon  ")
@@ -168,8 +208,4 @@ def test_valid_palindrome():
 
 
 if __name__ == "__main__":
-    test_single_number()
-    # test_valid_palindrome()
-    # test_plus_one()
-    # str_str_test()
-    # length_of_last_word_test()
+    test_get_row()
