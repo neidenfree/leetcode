@@ -155,7 +155,28 @@ class Solution:
                 elem = n
         return elem
 
+    def convertToTitle(self, columnNumber: int) -> str:
+        res = []
+        temp = columnNumber
+        while temp != 0:
+            if temp % 26 == 0:
+                res.append(26)
+                temp -= 1
+            else:
+                res.append(temp % 26)
+            temp = temp // 26
+        res.reverse()
+        return ''.join([chr(x + 64) for x in res])
 
+    def titleToNumber(self, columnTitle: str) -> int:
+        res = []
+        for i, c in enumerate(columnTitle):
+            res.append(ord(c) - 64)
+        res.reverse()
+        r = 0
+        for i, n in enumerate(res):
+            r += n * (26 ** i)
+        return r
 
 
 class TestSolution(unittest.TestCase):
@@ -173,6 +194,24 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(self.solution.majorityElement([3, 2, 3]), 3)
         self.assertEqual(self.solution.majorityElement([2, 2, 1, 1, 1, 2, 2]), 2)
 
+    def test_convert_to_title(self):
+        self.assertEqual(self.solution.convertToTitle(1), 'A')
+        self.assertEqual(self.solution.convertToTitle(28), 'AB')
+        self.assertEqual(self.solution.convertToTitle(26), 'Z')
+        self.assertEqual(self.solution.convertToTitle(701), 'ZY')
+        self.assertEqual(self.solution.convertToTitle(133), 'EC')
+        self.assertEqual(self.solution.convertToTitle(286), 'JZ')
+        self.assertEqual(self.solution.convertToTitle(754), 'ABZ')
+        self.assertEqual(self.solution.convertToTitle(753), 'ABY')
+
+    def test_title_to_number(self):
+        self.assertEqual(self.solution.titleToNumber('A'), 1)
+        self.assertEqual(self.solution.titleToNumber('AB'), 28)
+        self.assertEqual(self.solution.titleToNumber('ZY'), 701)
+        self.assertEqual(self.solution.titleToNumber('EC'), 133)
+        self.assertEqual(self.solution.titleToNumber('JZ'), 286)
+        self.assertEqual(self.solution.titleToNumber('ABZ'), 754)
+        self.assertEqual(self.solution.titleToNumber('ABY'), 753)
 
 
 def test_add_binary():
