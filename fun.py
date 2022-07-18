@@ -2,6 +2,8 @@ from typing import List
 
 from utils import test_equal
 
+import unittest
+
 
 def spiral_matrix(n: int):
     def print_mat(mat) -> None:
@@ -138,16 +140,39 @@ class Solution:
 
         return row
 
+    def majorityElement(self, nums: List[int]) -> int:
+        dic = {}
+        for n in nums:
+            if n in dic:
+                dic[n] += 1
+            else:
+                dic[n] = 1
+        m = -1
+        elem = 0
+        for n in dic:
+            if dic[n] > m:
+                m = dic[n]
+                elem = n
+        return elem
 
-def test_get_row():
-    a = Solution()
-    assert a.getRow(0) == [1]
-    assert a.getRow(1) == [1, 1]
-    assert a.getRow(2) == [1, 2, 1]
-    assert a.getRow(3) == [1, 3, 3, 1]
-    assert a.getRow(4) == [1, 4, 6, 4, 1]
 
-    print(a.getRow(33))
+
+
+class TestSolution(unittest.TestCase):
+    def setUp(self) -> None:
+        self.solution = Solution()
+
+    def test_get_row(self):
+        self.assertEqual(self.solution.getRow(0), [1])
+        self.assertEqual(self.solution.getRow(1), [1, 1])
+        self.assertEqual(self.solution.getRow(2), [1, 2, 1])
+        self.assertEqual(self.solution.getRow(3), [1, 3, 3, 1])
+        self.assertEqual(self.solution.getRow(4), [1, 4, 6, 4, 1])
+
+    def test_majority_element(self):
+        self.assertEqual(self.solution.majorityElement([3, 2, 3]), 3)
+        self.assertEqual(self.solution.majorityElement([2, 2, 1, 1, 1, 2, 2]), 2)
+
 
 
 def test_add_binary():
@@ -208,4 +233,4 @@ def test_valid_palindrome():
 
 
 if __name__ == "__main__":
-    test_get_row()
+    unittest.main()
