@@ -178,6 +178,33 @@ class Solution:
             r += n * (26 ** i)
         return r
 
+    def hammingWeight(self, n: int) -> int:
+        s = str(bin(n)[2:])
+        res = 0
+        for c in s:
+            if c == '1':
+                res += 1
+        return res
+
+    def isIsomorphic(self, s: str, t: str) -> bool:
+        n = m = 0
+        dif_s = {}
+        order_s = []
+        dif_t = {}
+        order_t = []
+        for i in range(len(s)):
+            if s[i] not in dif_s:
+                dif_s[s[i]] = n
+                n += 1
+            order_s.append(dif_s[s[i]])
+
+            if t[i] not in dif_t:
+                dif_t[t[i]] = m
+                m += 1
+            order_t.append(dif_t[t[i]])
+
+        return order_t == order_s
+
 
 class TestSolution(unittest.TestCase):
     def setUp(self) -> None:
@@ -212,6 +239,20 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(self.solution.titleToNumber('JZ'), 286)
         self.assertEqual(self.solution.titleToNumber('ABZ'), 754)
         self.assertEqual(self.solution.titleToNumber('ABY'), 753)
+
+    def test_hammingWeight(self):
+        self.assertEqual(self.solution.hammingWeight(0), 0)
+        self.assertEqual(self.solution.hammingWeight(7), 3)
+        self.assertEqual(self.solution.hammingWeight(8), 1)
+        self.assertEqual(self.solution.hammingWeight(9), 2)
+        self.assertEqual(self.solution.hammingWeight(8123), 11)
+
+    def test_is_isomorphic(self):
+        self.assertTrue(self.solution.isIsomorphic("egg", "add"))
+        self.assertFalse(self.solution.isIsomorphic("foo", "bar"))
+        self.assertTrue(self.solution.isIsomorphic("paper", "title"))
+        self.assertTrue(self.solution.isIsomorphic("asdfgh", "qwerty"))
+        self.assertFalse(self.solution.isIsomorphic("asdfga", "qwqrtq"))
 
 
 def test_add_binary():
