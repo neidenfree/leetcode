@@ -4,6 +4,8 @@ from utils import test_equal
 
 import unittest
 
+from collections import deque
+
 
 def spiral_matrix(n: int):
     def print_mat(mat) -> None:
@@ -205,10 +207,76 @@ class Solution:
 
         return order_t == order_s
 
+    def maxProfit(self, prices: List[int]) -> int:
+        res = 0
+        for i in range(len(prices) - 1):
+            if prices[i + 1] > prices[i]:
+                res += prices[i + 1] - prices[i]
+        return res
+
+    def rotate_deque(self, nums: List[int], k: int) -> None:
+        from collections import deque
+        k = k % len(nums)
+        temp = deque(nums)
+        for _ in range(k):
+            item = temp.pop()
+            temp.appendleft(item)
+        for i, x in enumerate(temp):
+            nums[i] = x
+
+    def rotate_list(self, nums: List[int], k: int):
+        k = k % len(nums)
+        new_nums = []
+        for i in range(k + 1, len(nums)):
+            new_nums.append(nums[i])
+        for i in range(0, k + 1):
+            new_nums.append(nums[i])
+        for i in range(len(nums)):
+            nums[i] = new_nums[i]
+
+    def rotate(self, nums: List[int], k: int):
+        k = k % len(nums)
+        for _ in range(k):
+            item = nums.pop()
+            nums.insert(0, item)
+
+    def containsDuplicate(self, nums: List[int]) -> bool:
+        dic = {}
+        for elem in nums:
+            if elem in dic:
+                return True
+            else:
+                dic[elem] = True
+        return False
+
 
 class TestSolution(unittest.TestCase):
     def setUp(self) -> None:
         self.solution = Solution()
+
+    def test_duplicate(self):
+        nums = [1, 2, 3, 4, 5]
+        self.assertFalse(self.solution.containsDuplicate(nums))
+        nums = [1, 2, 3, 4, 5, 1]
+        self.assertTrue(self.solution.containsDuplicate(nums))
+        nums = [1, 1]
+        self.assertTrue(self.solution.containsDuplicate(nums))
+
+
+
+    def test_rotate(self):
+        nums_old = [1, 2, 3, 4, 5, 6, 7]
+        nums = [1, 2, 3, 4, 5, 6, 7]
+        k = 3
+        self.solution.rotate(nums, k)
+        self.assertListEqual(nums, [5, 6, 7, 1, 2, 3, 4])
+
+    def test_max_profit(self):
+        f = self.solution.maxProfit
+        self.assertEqual(f([7, 1, 5, 3, 6, 4]), 7)
+        self.assertEqual(f([1, 2, 3, 4, 5]), 4)
+        self.assertEqual(f([7, 6, 4, 3, 1]), 0)
+        self.assertEqual(f([]), 0)
 
     def test_get_row(self):
         self.assertEqual(self.solution.getRow(0), [1])
