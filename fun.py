@@ -1,5 +1,7 @@
 from typing import List
 
+from collections import Counter
+
 from utils import test_equal
 
 import unittest
@@ -234,7 +236,7 @@ class Solution:
         for i in range(len(nums)):
             nums[i] = new_nums[i]
 
-    def rotate(self, nums: List[int], k: int):
+    def rotate_inplace(self, nums: List[int], k: int):
         k = k % len(nums)
         for _ in range(k):
             item = nums.pop()
@@ -249,10 +251,329 @@ class Solution:
                 dic[elem] = True
         return False
 
+    def intersect(self, nums1: List[int], nums2: List[int]) -> List[int]:
+        if len(nums1) < len(nums2):
+            return self.intersect(nums2, nums1)
+
+        res = []
+        for el in nums1:
+            if el in nums2:
+                del nums2[nums2.index(el)]
+                res.append(el)
+
+        return res
+
+    def twoSum(self, nums: List[int], target: int) -> List[int]:
+        # for i in range(len(nums)):
+        #     for j in range(i, len(nums)):
+        #         if i != j and nums[i] + nums[j] == target:
+        #             return [i, j]
+        d = {target - value: i for i, value in enumerate(nums)}
+        for i, el in enumerate(nums):
+            if el in d:
+                if i != d[el]:
+                    return [i, d[el]]
+
+    def isValidSudoku(self, board: List[List[str]]) -> bool:
+        # each row
+        d = {}
+        for row in board:
+            for el in row:
+                if el != '.':
+                    if el in d:
+                        return False
+                    else:
+                        d[el] = True
+            d.clear()
+        # each column
+        for i in range(len(board)):
+            for j in range(len(board)):
+                if board[j][i] != '.':
+                    if board[j][i] in d:
+                        return False
+                    else:
+                        d[board[j][i]] = True
+            d.clear()
+
+        # each nine sub-boxes
+        for topleft, bottomright in zip([(0, 0), (0, 3), (0, 6),
+                                         (3, 0), (3, 3), (3, 6),
+                                         (6, 0), (6, 3), (6, 6)],
+                                        [(2, 2), (2, 5), (2, 8),
+                                         (5, 2), (5, 5), (5, 8),
+                                         (8, 2), (8, 5), (8, 8)]):
+            d.clear()
+            for i in range(topleft[0], bottomright[0] + 1):
+                for j in range(topleft[1], bottomright[1] + 1):
+                    if board[i][j] != '.':
+                        if board[i][j] in d:
+                            return False
+                        else:
+                            d[board[i][j]] = True
+        return True
+
+    def rotate_other_matrix(self, matrix: List[List[int]]) -> None:
+        n = len(matrix) - 1
+        m = [[None for x in range(len(matrix))] for _ in range(len(matrix))]
+        for i in range(len(matrix)):
+            for j in range(len(matrix[0])):
+                m[j][n - i] = matrix[i][j]
+        for i in range(len(matrix)):
+            for j in range(len(matrix[0])):
+                matrix[i][j] = m[i][j]
+        s = ''
+
+    @staticmethod
+    def print_matrix(matrix: List[List[int]]):
+        for row in matrix:
+            for el in row:
+                print(str(el).ljust(3, ' '), end='')
+            print()
+
+    def rotate(self, matrix: List[List[int]]) -> None:
+        n = len(matrix) - 1
+        # first, we interchange rows
+        for i in range(len(matrix) // 2):
+            matrix[i], matrix[n - i] = matrix[n - i], matrix[i]
+
+        # second, we transpose matrix
+        for i in range(len(matrix)):
+            for j in range(i, len(matrix)):
+                temp = matrix[i][j]
+                matrix[i][j] = matrix[j][i]
+                matrix[j][i] = temp
+
+    def reverseString(self, s: List[str]) -> None:
+        left = 0
+        right = len(s) - 1
+        for _ in range(len(s) // 2):
+            s[left], s[right] = s[right], s[left]
+            left += 1
+            right -= 1
+
+    def reverse(self, x: int) -> int:
+        if x > 2 ** 31 - 1 or x < -2 ** 31:
+            return 0
+        s = str(x)
+        if s[0] == '-':
+            res = int('-' + s[1:][::-1])
+        else:
+            res = int(str(x)[::-1])
+
+        if res > 2 ** 31 - 1 or res < -2 ** 31:
+            return 0
+        return res
+
+    def firstUniqChar(self, s: str) -> int:
+        c = Counter(s)
+        for i, elem in enumerate(s):
+            if c[elem] == 1:
+                return i
+        return -1
+
+    def isAnagram(self, s: str, t: str) -> bool:
+        if len(s) != len(t):
+            return False
+        c1, c2 = Counter(s), Counter(t)
+        return c1 == c2
+
+    def myAtoi(self, s: str) -> int:
+        sign_occurred = False
+        digit_occurred = False
+        sign = True
+        res: List[str] = []
+        s = s.lstrip()
+        for elem in s:
+            if elem == "-" and not sign_occurred and not digit_occurred:
+                sign = False
+                sign_occurred = True
+            elif elem == "+" and not sign_occurred and not digit_occurred:
+                sign = True
+                sign_occurred = True
+            elif elem.isnumeric():
+                res.append(elem)
+                digit_occurred = True
+            else:
+                break
+
+        if len(res) == 0:
+            return 0
+
+        res_int = int("".join(res))
+        if not sign:
+            res_int = -res_int
+        if res_int > 2 ** 31 - 1:
+            return 2 ** 31 - 1
+        if res_int < -2 ** 31:
+            return -2 ** 31
+        return res_int
+
+    def longestCommonPrefix(self, strs: List[str]) -> str:
+        if len(strs) == 0:
+            return ""
+        res = []
+        word_with_min_length = min(strs, key=lambda x: len(x))
+        for i, letter in enumerate(word_with_min_length):
+            letter_acceptable = True
+            for elem in strs:
+                if elem[i] != letter:
+                    letter_acceptable = False
+                    break
+            if letter_acceptable:
+                res.append(letter)
+            else:
+                break
+        return "".join(res)
+
+
+
+
 
 class TestSolution(unittest.TestCase):
     def setUp(self) -> None:
         self.solution = Solution()
+
+    def test_longestCommonPrefix(self):
+        f = self.solution.longestCommonPrefix
+        self.assertEqual(f(["flower", "flow", "flight"]), "fl")
+        self.assertEqual(f(["dog", "racecar", "car"]), "")
+        self.assertEqual(f(["dog", "dogfuck", "dogsomething"]), "dog")
+
+    def test_myAtoi(self):
+        f = self.solution.myAtoi
+        self.assertEqual(f("+1"), 1)
+        self.assertEqual(f("00000-42a1234"), 0)
+        self.assertEqual(f("42"), 42)
+        self.assertEqual(f("      -42"), -42)
+        self.assertEqual(f("      --42"), 0)
+        self.assertEqual(f("   23  "), 23)
+        self.assertEqual(f("  -23asshole"), -23)
+        self.assertEqual(f("4193 with words"), 4193)
+        self.assertEqual(f("23     asshole"), 23)
+        self.assertEqual(f("words and 987"), 0)
+        self.assertEqual(f("21474836460"), 2147483647)
+
+    def test_isAnagram(self):
+        f = self.solution.isAnagram
+        self.assertTrue(f("boob", "bobo"))
+        self.assertTrue(f("zyzz", "yzzz"))
+        self.assertTrue(f("anagram", "naaramg"))
+        self.assertFalse(f("rat", "carr"))
+        self.assertFalse(f("rat", "car"))
+
+    def test_firstUniqChar(self):
+        f = self.solution.firstUniqChar
+        self.assertEqual(f('leetcode'), 0)
+        self.assertEqual(f('loveleetcode'), 2)
+        self.assertEqual(f('aabb'), -1)
+        self.assertEqual(f('aabbcc'), -1)
+        self.assertEqual(f('aabbc'), 4)
+
+    def test_reverse(self):
+        f = self.solution.reverse
+        self.assertEqual(123, f(321))
+        self.assertEqual(-123, f(-321))
+        self.assertEqual(0, f(1534236469))
+        self.assertEqual(12, f(21))
+        self.assertEqual(2, f(2))
+
+    def test_reverseString(self):
+        f = self.solution.reverseString
+
+        orig = [*"some"]
+        f(orig)
+        self.assertListEqual(orig, [*"emos"])
+
+        orig = [*"s"]
+        f(orig)
+        self.assertListEqual(orig, [*"s"])
+
+        orig = [*"somee"]
+        f(orig)
+        self.assertListEqual(orig, [*"eemos"])
+
+        orig = [*"abc"]
+        f(orig)
+        self.assertListEqual(orig, [*"cba"])
+
+    def test_rotate(self):
+        matrix = [[1, 2], [3, 4]]
+        right_res = [[3, 1], [4, 2]]
+        self.solution.rotate(matrix)
+        self.assertListEqual(matrix, right_res)
+
+        matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+        right_res = [[7, 4, 1], [8, 5, 2], [9, 6, 3]]
+        self.solution.rotate(matrix)
+        self.assertListEqual(matrix, right_res)
+        #
+        matrix = [[5, 1, 9, 11], [2, 4, 8, 10], [13, 3, 6, 7], [15, 14, 12, 16]]
+        right_res = [[15, 13, 2, 5], [14, 3, 4, 1], [12, 6, 8, 9], [16, 7, 10, 11]]
+        self.solution.rotate(matrix)
+        self.assertListEqual(matrix, right_res)
+
+    def test_isValidSudoku(self):
+        board = [["5", "3", ".", ".", "7", ".", ".", ".", "."]
+            , ["6", ".", ".", "1", "9", "5", ".", ".", "."]
+            , [".", "9", "8", ".", ".", ".", ".", "6", "."]
+            , ["8", ".", ".", ".", "6", ".", ".", ".", "3"]
+            , ["4", ".", ".", "8", ".", "3", ".", ".", "1"]
+            , ["7", ".", ".", ".", "2", ".", ".", ".", "6"]
+            , [".", "6", ".", ".", ".", ".", "2", "8", "."]
+            , [".", ".", ".", "4", "1", "9", ".", ".", "5"]
+            , [".", ".", ".", ".", "8", ".", ".", "7", "9"]]
+        self.assertTrue(self.solution.isValidSudoku(board))
+
+        board = [["8", "3", ".", ".", "7", ".", ".", ".", "."]
+            , ["6", ".", ".", "1", "9", "5", ".", ".", "."]
+            , [".", "9", "8", ".", ".", ".", ".", "6", "."]
+            , ["8", ".", ".", ".", "6", ".", ".", ".", "3"]
+            , ["4", ".", ".", "8", ".", "3", ".", ".", "1"]
+            , ["7", ".", ".", ".", "2", ".", ".", ".", "6"]
+            , [".", "6", ".", ".", ".", ".", "2", "8", "."]
+            , [".", ".", ".", "4", "1", "9", ".", ".", "5"]
+            , [".", ".", ".", ".", "8", ".", ".", "7", "9"]]
+
+        self.assertFalse(self.solution.isValidSudoku(board))
+
+        board = [["5", "3", ".", "7", "7", ".", ".", ".", "."]
+            , ["6", ".", ".", "1", "9", "5", ".", ".", "."]
+            , [".", "9", "8", ".", ".", ".", ".", "6", "."]
+            , ["8", ".", ".", ".", "6", ".", ".", ".", "3"]
+            , ["4", ".", ".", "8", ".", "3", ".", ".", "1"]
+            , ["7", ".", ".", ".", "2", ".", ".", ".", "6"]
+            , [".", "6", ".", ".", ".", ".", "2", "8", "."]
+            , [".", ".", ".", "4", "1", "9", ".", ".", "5"]
+            , [".", ".", ".", ".", "8", ".", ".", "7", "9"]]
+        self.assertFalse(self.solution.isValidSudoku(board))
+
+    def test_twoSum(self):
+        s = self.solution
+        nums = [2, 7, 11, 15]
+        target = 9
+        self.assertListEqual(s.twoSum(nums, target), [0, 1])
+
+        nums = [3, 2, 4]
+        target = 6
+        self.assertListEqual(s.twoSum(nums, target), [1, 2])
+
+        nums = [3, 3]
+        target = 6
+        self.assertListEqual(s.twoSum(nums, target), [0, 1])
+
+    def test_intersection(self):
+        s = self.solution
+        nums1 = [1, 2, 2, 1]
+        nums2 = [2, 2]
+        self.assertListEqual([2, 2], s.intersect(nums1, nums2))
+
+        nums1 = [4, 9, 5]
+        nums2 = [9, 4, 9, 8, 4]
+        self.assertListEqual([9, 4], s.intersect(nums1, nums2))
+
+        nums1 = [1, 2, 3]
+        nums2 = [4, 5]
+        self.assertListEqual([], s.intersect(nums1, nums2))
 
     def test_duplicate(self):
         nums = [1, 2, 3, 4, 5]
@@ -261,15 +582,6 @@ class TestSolution(unittest.TestCase):
         self.assertTrue(self.solution.containsDuplicate(nums))
         nums = [1, 1]
         self.assertTrue(self.solution.containsDuplicate(nums))
-
-
-
-    def test_rotate(self):
-        nums_old = [1, 2, 3, 4, 5, 6, 7]
-        nums = [1, 2, 3, 4, 5, 6, 7]
-        k = 3
-        self.solution.rotate(nums, k)
-        self.assertListEqual(nums, [5, 6, 7, 1, 2, 3, 4])
 
     def test_max_profit(self):
         f = self.solution.maxProfit
